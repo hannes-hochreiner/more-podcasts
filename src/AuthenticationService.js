@@ -7,6 +7,20 @@ export default class AuthenticationService {
     this._userPoolId = 'eu-central-1_jUeKzeHCz';
     this._clientId = '2l07nc0987v932rhiaqrl2c294';
     PubSub.subscribe('system.getIdToken.request', this._getIdToken.bind(this));
+    PubSub.subscribe('system.logout.request', this._logout.bind(this));
+  }
+
+  _logout(topic, data) {
+    let userPool = new CognitoUserPool({
+      UserPoolId : this._userPoolId,
+      ClientId : this._clientId
+    });
+
+    if (userPool.getCurrentUser()) {
+      userPool.getCurrentUser().signOut();
+    }
+
+    PubSub.publish(`system.logout.response.${topic.split('.')[3]}`);
   }
 
   _getCurrentIdToken() {

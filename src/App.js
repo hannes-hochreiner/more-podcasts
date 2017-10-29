@@ -28,7 +28,9 @@ class App extends Component {
           <p className="App-intro">
             To get started, edit <code>src/App.js</code> and save to reload.
           </p>
-          <button onClick={this._authRequest}>sign in</button>
+          <button onClick={this._getApiChannels}>get api channels</button>
+          <button onClick={this._postNewApiChannel}>post new api channel</button>
+          <button onClick={this._logout}>logout</button>
           <AuthenticationDialog/>
           {this.props.children}
         </div>
@@ -36,9 +38,16 @@ class App extends Component {
     );
   }
 
-  _authRequest() {
-    PubSub.publish('system.postNewApiChannel.request.1', {url: 'http://sixgun.org/feed/gnr'});
+  _logout() {
+    PubSub.publish('system.logout.request.1');
+  }
+
+  _getApiChannels() {
     PubSub.publish('system.getApiChannels.request.1');
+  }
+
+  _postNewApiChannel() {
+    PubSub.publish('system.postNewApiChannel.request.1', {url: 'http://sixgun.org/feed/gnr'});
   }
 }
 
