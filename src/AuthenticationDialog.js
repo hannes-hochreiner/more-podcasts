@@ -32,17 +32,19 @@ export default class AuthenticationDialog extends React.Component {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-          <TextField
-            hintText="username"
-            floatingLabelText="username"
-            fullWidth={true}
-          /><br/>
-          <TextField
-            hintText="password"
-            floatingLabelText="password"
-            type="password"
-            fullWidth={true}
-          />
+          <form>
+            <TextField
+              hintText="username"
+              floatingLabelText="username"
+              fullWidth={true}
+            /><br/>
+            <TextField
+              hintText="password"
+              floatingLabelText="password"
+              type="password"
+              fullWidth={true}
+            />
+          </form>
         </Dialog>
       </div>
     );
