@@ -5,6 +5,7 @@ import axios from 'axios';
 export default class ChannelService {
   constructor() {
     PubSub.subscribe('system.getApiChannels.request', this._getApiChannels.bind(this));
+    PubSub.subscribe('system.getApiChannelById.request', this._getApiChannelById.bind(this));
     PubSub.subscribe('system.postNewApiChannel.request', this._postNewApiChannel.bind(this));
   }
 
@@ -22,6 +23,23 @@ export default class ChannelService {
         pubObj.channels = res.data.channels;
       }
       PubSub.publish(`system.getApiChannels.response.${topic.split('.')[3]}`, pubObj);
+    });
+  }
+
+  _getApiChannelById(topic, data) {
+    pps('system.getIdToken').then(idToken => {
+      return axios.get(`https://internal.hochreiner.net/rss-json-service/channels/${data.id}`, {
+        headers: {'Authorization': `Bearer ${idToken.idToken}`}
+      });
+    }).then(res => {
+      let pubObj = {};
+
+      if (res.data.error) {
+        pubObj.error = res.data.error;
+      } else {
+        pubObj.channel = res.data.channel;
+      }
+      PubSub.publish(`system.getApiChannelById.response.${topic.split('.')[3]}`, pubObj);
     });
   }
 

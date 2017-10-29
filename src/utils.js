@@ -10,7 +10,7 @@ function _promisedPubSub(topic, data, resolve, reject) {
   let cancelToken = PubSub.subscribe(`${topic}.response.${requestId}`, (resTopic, resData) => {
     PubSub.unsubscribe(cancelToken);
 
-    if (resData.error) {
+    if (resData && resData.error) {
       reject(resData.error);
       return;
     }

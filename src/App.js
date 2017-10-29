@@ -20,17 +20,7 @@ class App extends Component {
   render() {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
-          </header>
-          <p className="App-intro">
-            To get started, edit <code>src/App.js</code> and save to reload.
-          </p>
-          <button onClick={this._getApiChannels}>get api channels</button>
-          <button onClick={this._postNewApiChannel}>post new api channel</button>
-          <button onClick={this._logout}>logout</button>
+        <div>
           <AuthenticationDialog/>
           {this.props.children}
         </div>
