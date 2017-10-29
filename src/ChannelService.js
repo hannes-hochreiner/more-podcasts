@@ -10,7 +10,7 @@ export default class ChannelService {
   _getApiChannels(topic, data) {
     pps('system.getIdToken').then(idToken => {
       return axios.get('https://internal.hochreiner.net/rss-json-service/channels', {
-        headers: {'Authentication': `Baerer ${idToken}`}
+        headers: {'Authorization': `Bearer ${idToken}`}
       });
     }).then(res => {
       console.dir(res);
