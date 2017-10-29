@@ -37,6 +37,7 @@ class App extends Component {
   }
 
   _authRequest() {
+    PubSub.publish('system.postNewApiChannel.request.1', {url: 'http://sixgun.org/feed/gnr'});
     PubSub.publish('system.getApiChannels.request.1');
   }
 }
