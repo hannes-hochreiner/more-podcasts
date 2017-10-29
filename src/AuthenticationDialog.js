@@ -26,7 +26,6 @@ export default class AuthenticationDialog extends React.Component {
     return (
       <div>
         <Dialog
-          title="Authentication"
           actions={actions}
           modal={true}
           open={this.state.open}
