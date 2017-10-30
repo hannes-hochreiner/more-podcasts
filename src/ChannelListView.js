@@ -59,6 +59,10 @@ export default class ChannelListView extends Component {
     this._pres.updateChannelSelection(event.target.value, isChecked);
   }
 
+  _handleListItemClick(id) {
+    this._pres.showChannel(id);
+  }
+
   render() {
     return (
       <div>
@@ -83,8 +87,10 @@ export default class ChannelListView extends Component {
               {this.state.selectedChannels.map(channel => {
                 return <ListItem
                   key={channel.id}
+                  value={channel.id}
                   primaryText={channel.title}
                   secondaryText={channel.description}
+                  onClick={this._handleListItemClick.bind(this, channel.id)}
                 />;
               })}
             </List>

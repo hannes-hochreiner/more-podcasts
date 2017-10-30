@@ -46,6 +46,10 @@ export default class ChannelListPresenter {
     });
   }
 
+  showChannel(id) {
+    PubSub.publish('system.goToChannelPage.request', {id:id});
+  }
+
   finalize() {
 
   }
