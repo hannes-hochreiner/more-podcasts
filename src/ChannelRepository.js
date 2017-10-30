@@ -4,6 +4,7 @@ export default class ChannelRepository {
     this._ps = pubSub;
 
     this._ps.subscribe('system.getAllChannels.request', this.getAllChannels.bind(this));
+    this._ps.subscribe('system.getChannelById.request', this.getChannelById.bind(this));
     this._ps.subscribe('system.addOrUpdateChannel.request', this.addOrUpdateChannel.bind(this));
   }
 
@@ -22,6 +23,16 @@ export default class ChannelRepository {
       });
     }).catch(err => {
       this._ps.publish(respId, { error: err });
+    });
+  }
+
+  getChannelById(topic, data) {
+    let respId = `system.getChannelById.response.${topic.split('.')[3]}`;
+
+    this._pouch.get(`channels/${data.id}`).then(channel => {
+      this._ps.publish(respId, {channel: channel});
+    }).catch(err => {
+      this._ps.publish(respId, {error: err});
     });
   }
 

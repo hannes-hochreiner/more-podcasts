@@ -55,6 +55,10 @@ export default class ChannelListView extends Component {
     this._pres.syncChannels();
   }
 
+  _handleChannelSelectChange(event, isChecked) {
+    this._pres.updateChannelSelection(event.target.value, isChecked);
+  }
+
   render() {
     return (
       <div>
@@ -89,7 +93,11 @@ export default class ChannelListView extends Component {
             <List>
               {this.state.allChannels.map(channel => {
                 return <ListItem
-                  leftCheckbox={<Checkbox checked={channel.selected}/>}
+                  leftCheckbox={<Checkbox
+                    checked={channel.selected}
+                    onCheck={this._handleChannelSelectChange.bind(this)}
+                    value={channel.id}
+                  />}
                   key={channel.id}
                   primaryText={channel.title}
                   secondaryText={channel.description}

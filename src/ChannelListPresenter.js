@@ -36,6 +36,16 @@ export default class ChannelListPresenter {
     });
   }
 
+  updateChannelSelection(channelId, selected) {
+    pps('system.getChannelById', {id:channelId}).then(data => {
+      data.channel.selected = selected;
+
+      return pps('system.addOrUpdateChannel', data);
+    }).then(() => {
+      return this._updateChannels();
+    });
+  }
+
   finalize() {
 
   }
