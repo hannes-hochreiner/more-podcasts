@@ -7,6 +7,17 @@ export default class ChannelService {
     PubSub.subscribe('system.getApiChannels.request', this._getApiChannels.bind(this));
     PubSub.subscribe('system.getApiChannelById.request', this._getApiChannelById.bind(this));
     PubSub.subscribe('system.postNewApiChannel.request', this._postNewApiChannel.bind(this));
+    PubSub.subscribe('system.getApiItemsByChannelId.request', this._getApiItemsByChannelId.bind(this));
+  }
+
+  _getApiItemsByChannelId(topic, data) {
+    pps('system.getIdToken').then(idToken => {
+      return axios.get(`https://internal.hochreiner.net/rss-json-service/channels/${data.channelId}/items`, {
+        headers: {'Authorization': `Bearer ${idToken.idToken}`}
+      });
+    }).then(res => {
+      PubSub.publish(`system.getApiItemsByChannelId.response.${topic.split('.')[3]}`, res.data);
+    });
   }
 
   _getApiChannels(topic, data) {
@@ -15,14 +26,7 @@ export default class ChannelService {
         headers: {'Authorization': `Bearer ${idToken.idToken}`}
       });
     }).then(res => {
-      let pubObj = {};
-
-      if (res.data.error) {
-        pubObj.error = res.data.error;
-      } else {
-        pubObj.channels = res.data.channels;
-      }
-      PubSub.publish(`system.getApiChannels.response.${topic.split('.')[3]}`, pubObj);
+      PubSub.publish(`system.getApiChannels.response.${topic.split('.')[3]}`, res.data);
     });
   }
 
@@ -32,14 +36,7 @@ export default class ChannelService {
         headers: {'Authorization': `Bearer ${idToken.idToken}`}
       });
     }).then(res => {
-      let pubObj = {};
-
-      if (res.data.error) {
-        pubObj.error = res.data.error;
-      } else {
-        pubObj.channel = res.data.channel;
-      }
-      PubSub.publish(`system.getApiChannelById.response.${topic.split('.')[3]}`, pubObj);
+      PubSub.publish(`system.getApiChannelById.response.${topic.split('.')[3]}`, res.data);
     });
   }
 
@@ -51,14 +48,7 @@ export default class ChannelService {
         headers: {'Authorization': `Bearer ${idToken.idToken}`}
       });
     }).then(res => {
-      let pubObj = {};
-
-      if (res.data.error) {
-        pubObj.error = res.data.error;
-      } else {
-        pubObj.id = res.data.id;
-      }
-      PubSub.publish(`system.postNewApiChannel.response.${topic.split('.')[3]}`, pubObj);
+      PubSub.publish(`system.postNewApiChannel.response.${topic.split('.')[3]}`, res.data);
     });
   }
 }

@@ -51,7 +51,33 @@ export default class ChannelSyncService {
           });
         }
       }).filter(channel => { return typeof channel !== 'undefined'; }));
+    }).then(() => {
+      return pps('system.getAllChannels');
     }).then(res => {
+      return Promise.all(res.channels.filter(channel => {
+        return channel.selected;
+      }).map(channel => {
+        return Promise.all([
+          pps('system.getApiItemsByChannelId', {channelId: channel.id}),
+          pps('system.getItemsByChannelId', {channelId: channel.id}),
+        ]).then(itemRes => {
+          let newProms = [];
+          let apiItems = itemRes[0].items;
+          let localItems = itemRes[1].items;
+
+          apiItems.forEach(apiItem => {
+            let localItem = localItems.find(itm => { return itm.id === apiItem.id; });
+
+            if (!localItem) {
+              apiItem.channelId = channel.id;
+              newProms.push(pps('system.addOrUpdateItem', {item:apiItem}));
+            }
+          });
+
+          return Promise.all(newProms);
+        });
+      }));
+    }).then(() => {
       PubSub.publish(respId, {});
     }).catch(err => {
       PubSub.publish(respId, {error: err});
