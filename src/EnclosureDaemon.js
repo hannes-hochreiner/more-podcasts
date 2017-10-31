@@ -12,6 +12,12 @@ export default class EnclosureDaemon {
       return;
     }
 
+    let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+    if (connection && (connection.type !== 'ethernet' || connection.type !== 'wifi')) {
+      return;
+    }
+
     this.currentlyRunning = true;
 
     pps('system.getAllEnclosureDocs').then(res => {
