@@ -21,7 +21,11 @@ export default class ChannelService {
         responseType: 'blob'
       });
     }).then(res => {
-      PubSub.publish(`system.getApiItemBlobByChannelIdId.response.${topic.split('.')[3]}`, res.data);
+      if (res.error) {
+        PubSub.publish(`system.getApiItemBlobByChannelIdId.response.${topic.split('.')[3]}`, {error: res.error});
+      } else {
+        PubSub.publish(`system.getApiItemBlobByChannelIdId.response.${topic.split('.')[3]}`, {blob: res.data});
+      }
     });
   }
 

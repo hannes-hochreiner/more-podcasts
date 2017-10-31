@@ -8,12 +8,7 @@ export default class ChannelPresenter {
   }
 
   showItem(itemId) {
-    // pps('system.getApiItemBlobByChannelIdId', {channelId: this._view.channelId, id: itemId}).then(res => {
-    //   let audio = new Audio();
-    //
-    //   audio.src = URL.createObjectURL(res);
-    //   audio.play();
-    // });
+
   }
 
   requestDownload(channelId, itemId) {
@@ -22,8 +17,7 @@ export default class ChannelPresenter {
     }).then(() => {
       return pps('system.getEnclosureDocsByChannelId', {channelId: channelId});
     }).then(res => {
-      console.log('test');
-      console.log(res);
+      // TODO: update items
     });
   }
 

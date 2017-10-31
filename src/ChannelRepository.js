@@ -6,6 +6,7 @@ export default class ChannelRepository {
     this._ps.subscribe('system.getAllChannels.request', this.getAllChannels.bind(this));
     this._ps.subscribe('system.getChannelById.request', this.getChannelById.bind(this));
     this._ps.subscribe('system.getItemsByChannelId.request', this.getItemsByChannelId.bind(this));
+    this._ps.subscribe('system.getItemByChannelIdId.request', this.getItemByChannelIdId.bind(this));
     this._ps.subscribe('system.addOrUpdateChannel.request', this.addOrUpdateChannel.bind(this));
     this._ps.subscribe('system.addOrUpdateItem.request', this.addOrUpdateItem.bind(this));
   }
@@ -41,6 +42,16 @@ export default class ChannelRepository {
           return row.doc;
         })
       });
+    }).catch(err => {
+      this._ps.publish(respId, { error: err });
+    });
+  }
+
+  getItemByChannelIdId(topic, data) {
+    let respId = `system.getItemByChannelIdId.response.${topic.split('.')[3]}`;
+
+    this._pouch.get(`items/${data.channelId}/${data.id}`).then(item => {
+      this._ps.publish(respId, {item: item});
     }).catch(err => {
       this._ps.publish(respId, { error: err });
     });

@@ -30,10 +30,12 @@ export default class EnclosureDaemon {
         return pps('system.addOrUpdateEnclosureBinary', {
           channelId: docs[0].channelId,
           itemId: docs[0].itemId,
-          enclosure: res
+          enclosure: res.blob
         });
       });
     }).then(() => {
+      this.currentlyRunning = false;
+    }).catch(err => {
       this.currentlyRunning = false;
     });
   }

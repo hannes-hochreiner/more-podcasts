@@ -18,6 +18,7 @@ import ChannelSyncService from './ChannelSyncService';
 import NavigationService from './NavigationService';
 import EnclosureRepository from './EnclosureRepository';
 import EnclosureDaemon from './EnclosureDaemon';
+import PlayerView from './PlayerView';
 
 let pouchChannels = new pouchdb('more-podcasts_channelRepository');
 let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
@@ -39,6 +40,7 @@ ReactDOM.render(
       <Switch>
         <Route exact path="/" component={ChannelListView}/>
         <Route exact path="/channels/:channelId" component={ChannelView}/>
+        <Route exact path="/player" component={PlayerView}/>
       </Switch>
     </App>
   </Router>, document.getElementById('root'));
