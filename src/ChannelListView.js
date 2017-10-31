@@ -5,6 +5,12 @@ import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
 import ChannelListPresenter from './ChannelListPresenter';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import AppBar from 'material-ui/AppBar';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
+import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 
 export default class ChannelListView extends Component {
   state = {
@@ -64,23 +70,36 @@ export default class ChannelListView extends Component {
   }
 
   render() {
+    const menu = <IconMenu
+      iconButtonElement={<IconButton><MenuIcon color={'#FFF'}/></IconButton>}
+      anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+      targetOrigin={{horizontal: 'left', vertical: 'top'}}
+    >
+      <MenuItem primaryText="player" onClick={() => {this._pres.goToPlayerPage();}}/>
+    </IconMenu>;
+
     return (
       <div>
-        <TextField
-          value={this.state.newChannelUrl}
-          floatingLabelText="New channel URL"
-          onChange={this._handleNewChannelUrl.bind(this)}
-        />
-        <RaisedButton
-          label="Add"
-          primary={true}
-          onClick={this._addNewChannel.bind(this)}
-        />
-        <RaisedButton
-          label="Sync"
-          primary={true}
-          onClick={this._syncChannels.bind(this)}
-        />
+        <AppBar title="channels" showMenuIconButton="false" iconElementLeft={menu}/>
+        <Toolbar>
+          <ToolbarGroup firstChild={true}>
+            <TextField
+              value={this.state.newChannelUrl}
+              floatingLabelText="New channel URL"
+              onChange={this._handleNewChannelUrl.bind(this)}
+            />
+            <RaisedButton
+              label="Add"
+              primary={true}
+              onClick={this._addNewChannel.bind(this)}
+            />
+            <RaisedButton
+              label="Sync"
+              primary={true}
+              onClick={this._syncChannels.bind(this)}
+            />
+          </ToolbarGroup>
+        </Toolbar>
         <Tabs>
           <Tab label="selected">
             <List>

@@ -29,6 +29,10 @@ export default class PlayerPresenter {
     });
   }
 
+  goToChannelListPage() {
+    PubSub.publish('system.goToChannelListPage.request');
+  }
+
   selectedItemChanged(item) {
     this.stop();
     this._view.selectedItem = item;

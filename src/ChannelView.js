@@ -11,6 +11,8 @@ import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
+import AppBar from 'material-ui/AppBar';
+import BackIcon from 'material-ui/svg-icons/navigation/arrow-back';
 
 export default class ChannelView extends Component {
   state = {
@@ -40,7 +42,6 @@ export default class ChannelView extends Component {
   }
 
   _handleListItemClick(id) {
-    console.log('handleListItemClick');
     this._pres.showItem(id);
   }
 
@@ -51,8 +52,15 @@ export default class ChannelView extends Component {
       </IconButton>
     );
 
+    const backNavigation = (
+      <IconButton touch={true} onClick={() => {this._pres.goToChannelListPage();}}>
+        <BackIcon/>
+      </IconButton>
+    );
+
     return (
       <div>
+        <AppBar title="channel" showMenuIconButton="false" iconElementLeft={backNavigation}/>
         <List>
           {this.state.items.map(item => {
             const rightIconMenu = (

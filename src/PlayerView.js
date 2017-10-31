@@ -3,6 +3,11 @@ import {List, ListItem} from 'material-ui/List';
 import PlayerPresenter from './PlayerPresenter';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
+import AppBar from 'material-ui/AppBar';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
+import MenuIcon from 'material-ui/svg-icons/navigation/menu';
 
 export default class PlayerView extends Component {
   state = {
@@ -42,8 +47,17 @@ export default class PlayerView extends Component {
   }
 
   render() {
+    const menu = <IconMenu
+      iconButtonElement={<IconButton><MenuIcon color={'#FFF'}/></IconButton>}
+      anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+      targetOrigin={{horizontal: 'left', vertical: 'top'}}
+    >
+      <MenuItem primaryText="channels" onClick={() => {this._pres.goToChannelListPage();}}/>
+    </IconMenu>;
+
     return (
       <div>
+        <AppBar title="player" showMenuIconButton="false" iconElementLeft={menu}/>
         <Toolbar>
           <ToolbarGroup firstChild={true}>
             <RaisedButton label="play" primary={true}

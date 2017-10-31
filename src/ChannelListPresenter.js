@@ -16,6 +16,10 @@ export default class ChannelListPresenter {
     });
   }
 
+  goToPlayerPage() {
+    PubSub.publish('system.goToPlayerPage.request');
+  }
+
   addNewChannel(channelUrl) {
     pps('system.postNewApiChannel', {url: channelUrl}).then(id => {
       this._view.newChannelUrl = '';

@@ -38,7 +38,8 @@ ReactDOM.render(
   <Router>
     <App>
       <Switch>
-        <Route exact path="/" component={ChannelListView}/>
+        <Route exact path="/" component={PlayerView}/>
+        <Route exact path="/channels" component={ChannelListView}/>
         <Route exact path="/channels/:channelId" component={ChannelView}/>
         <Route exact path="/player" component={PlayerView}/>
       </Switch>

@@ -11,6 +11,10 @@ export default class ChannelPresenter {
 
   }
 
+  goToChannelListPage() {
+    PubSub.publish('system.goToChannelListPage.request');
+  }
+
   requestDownload(channelId, itemId) {
     pps('system.addOrUpdateEnclosureDoc', {
       enclosureDoc: {channelId: channelId, itemId: itemId}
