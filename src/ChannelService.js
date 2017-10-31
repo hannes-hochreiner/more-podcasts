@@ -8,6 +8,21 @@ export default class ChannelService {
     PubSub.subscribe('system.getApiChannelById.request', this._getApiChannelById.bind(this));
     PubSub.subscribe('system.postNewApiChannel.request', this._postNewApiChannel.bind(this));
     PubSub.subscribe('system.getApiItemsByChannelId.request', this._getApiItemsByChannelId.bind(this));
+    PubSub.subscribe('system.getApiItemBlobByChannelIdId.request', this._getApiItemBlobByChannelIdId.bind(this));
+  }
+
+  _getApiItemBlobByChannelIdId(topic, data) {
+    pps('system.getIdToken').then(idToken => {
+      return axios.get(`https://internal.hochreiner.net/rss-json-service/channels/${data.channelId}/items/${data.id}`, {
+        headers: {
+          'Authorization': `Bearer ${idToken.idToken}`,
+          'Accept': 'audio/mpeg'
+        },
+        responseType: 'blob'
+      });
+    }).then(res => {
+      PubSub.publish(`system.getApiItemBlobByChannelIdId.response.${topic.split('.')[3]}`, res.data);
+    });
   }
 
   _getApiItemsByChannelId(topic, data) {

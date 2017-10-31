@@ -71,6 +71,10 @@ export default class ChannelSyncService {
             if (!localItem) {
               apiItem.channelId = channel.id;
               newProms.push(pps('system.addOrUpdateItem', {item:apiItem}));
+            } else {
+              if (mergePropertiesFromObject(localItem, ['title', 'date', 'enclosure'], apiItem)) {
+                newProms.push(pps('system.addOrUpdateItem', {item:localItem}));
+              }
             }
           });
 

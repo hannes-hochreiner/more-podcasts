@@ -6,7 +6,7 @@ export function mergePropertiesFromObject(mainObj, props, suppObj) {
       return;
     }
 
-    if (mainObj[prop] === suppObj[prop]) {
+    if (JSON.stringify(mainObj[prop]) === JSON.stringify(suppObj[prop])) {
       return;
     }
 

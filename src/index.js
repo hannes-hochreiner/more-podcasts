@@ -16,14 +16,20 @@ import ChannelService from './ChannelService';
 import ChannelRepository from './ChannelRepository';
 import ChannelSyncService from './ChannelSyncService';
 import NavigationService from './NavigationService';
+import EnclosureRepository from './EnclosureRepository';
+import EnclosureDaemon from './EnclosureDaemon';
 
-let pouch = new pouchdb('more-podcasts_channelRepository');
-new ChannelRepository(pouch, PubSub);
+let pouchChannels = new pouchdb('more-podcasts_channelRepository');
+let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
+
+new ChannelRepository(pouchChannels, PubSub);
+new EnclosureRepository(pouchEnclosures, PubSub);
 new AuthenticationService();
 new ConsoleLogger();
 new ChannelService();
 new ChannelSyncService();
 new NavigationService();
+new EnclosureDaemon();
 
 injectTapEventPlugin();
 

@@ -5,6 +5,12 @@ import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
 import ChannelPresenter from './ChannelPresenter';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import Chip from 'material-ui/Chip';
+import New from 'material-ui/svg-icons/av/new-releases';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
 
 export default class ChannelView extends Component {
   state = {
@@ -29,38 +35,40 @@ export default class ChannelView extends Component {
     this._pres.finalize();
   }
 
-  _handleNewChannelUrl(event) {
-    this.setState({
-      newChannelUrl: event.target.value
-    });
-  }
-
-  _addNewChannel() {
-    if (this.state.newChannelUrl) {
-      this._pres.addNewChannel(this.state.newChannelUrl);
-    }
-  }
-
-  _syncChannels() {
-    this._pres.syncChannels();
-  }
-
-  _handleChannelSelectChange(event, isChecked) {
-    this._pres.updateChannelSelection(event.target.value, isChecked);
+  _requestDownload(channelId, itemId) {
+    this._pres.requestDownload(channelId, itemId);
   }
 
   _handleListItemClick(id) {
-    this._pres.showChannel(id);
+    console.log('handleListItemClick');
+    this._pres.showItem(id);
   }
 
   render() {
+    const iconButtonElement = (
+      <IconButton touch={true}>
+        <MoreVertIcon/>
+      </IconButton>
+    );
+
     return (
       <div>
         <List>
           {this.state.items.map(item => {
+            const rightIconMenu = (
+              <IconMenu iconButtonElement={iconButtonElement}>
+                <MenuItem onClick={this._requestDownload.bind(this, item.channelId, item.id)}>download</MenuItem>
+                <MenuItem>toggle new</MenuItem>
+                <MenuItem>play</MenuItem>
+              </IconMenu>
+            );
+
             return <ListItem
               key={item.id}
+              rightIconButton={rightIconMenu}
+              leftIcon={<New/>}
               primaryText={item.title}
+              onClick={this._handleListItemClick.bind(this, item.id)}
             />;
           })}
         </List>
