@@ -19,6 +19,7 @@ import NavigationService from './NavigationService';
 import EnclosureRepository from './EnclosureRepository';
 import EnclosureDaemon from './EnclosureDaemon';
 import PlayerView from './PlayerView';
+import PlayerService from './PlayerService';
 
 let pouchChannels = new pouchdb('more-podcasts_channelRepository');
 let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
@@ -31,6 +32,7 @@ new ChannelService();
 new ChannelSyncService();
 new NavigationService();
 new EnclosureDaemon();
+new PlayerService();
 
 injectTapEventPlugin();
 

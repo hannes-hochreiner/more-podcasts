@@ -8,12 +8,15 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+import Slider from 'material-ui/Slider';
 
 export default class PlayerView extends Component {
   state = {
     items: [],
     selectedItem: null,
-    playing: false
+    playing: false,
+    volume: 0.5,
+    speed: 1.0
   };
 
   componentDidMount() {
@@ -42,8 +45,28 @@ export default class PlayerView extends Component {
     });
   }
 
+  set volume(value) {
+    this.setState({
+      volume: value
+    });
+  }
+
+  set speed(value) {
+    this.setState({
+      speed: value
+    });
+  }
+
   _handleListItemClick(item) {
     this._pres.selectedItemChanged(item);
+  }
+
+  _handleVolumeChange(event, value) {
+    this._pres.volumeChanged(value);
+  }
+
+  _handleSpeedChange(event, value) {
+    this._pres.speedChanged(value);
   }
 
   render() {
@@ -57,7 +80,7 @@ export default class PlayerView extends Component {
 
     return (
       <div>
-        <AppBar title="player" showMenuIconButton="false" iconElementLeft={menu}/>
+        <AppBar title="player" iconElementLeft={menu}/>
         <Toolbar>
           <ToolbarGroup firstChild={true}>
             <RaisedButton label="play" primary={true}
@@ -71,6 +94,8 @@ export default class PlayerView extends Component {
             {this.state.selectedItem ? this.state.selectedItem.title : ''}
           </ToolbarGroup>
         </Toolbar>
+        <Slider min={0} max={1} step={0.01} value={this.state.volume} onChange={this._handleVolumeChange.bind(this)}/>
+        <Slider min={0.5} max={2} step={0.05} value={this.state.speed} onChange={this._handleSpeedChange.bind(this)}/>
         <List>
           {this.state.items.map(item => {
             return <ListItem

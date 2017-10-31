@@ -4,15 +4,23 @@ import {promisedPubSub as pps} from './utils';
 export default class PlayerPresenter {
   constructor(view) {
     this._view = view;
-    this._audio = new Audio();
 
+    this._updateCurrentState();
     this._updatePlayList();
-    // pps('system.getApiItemBlobByChannelIdId', {channelId: this._view.channelId, id: itemId}).then(res => {
-    //   let audio = new Audio();
-    //
-    //   audio.src = URL.createObjectURL(res);
-    //   audio.play();
-    // });
+  }
+
+  _updateCurrentState() {
+    Promise.all([
+      pps('system.getPlayerPlaying'),
+      pps('system.getPlayerItem'),
+      pps('system.getPlayerVolume'),
+      pps('system.getPlayerSpeed')
+    ]).then(res => {
+      this._view.playing = res[0].playing;
+      this._view.selectedItem = res[1].item;
+      this._view.volume = res[2].volume;
+      this._view.speed = res[3].speed;
+    });
   }
 
   _updatePlayList() {
@@ -34,22 +42,36 @@ export default class PlayerPresenter {
   }
 
   selectedItemChanged(item) {
-    this.stop();
-    this._view.selectedItem = item;
-    pps('system.getEnclosureBinaryByChannelIdItemId', {channelId: item.channelId, itemId: item.id}).then(res => {
-      this._audio.src = URL.createObjectURL(res.enclosure);
-      this.start();
+    this.stop().then(() => {
+      return pps('system.setPlayerItem', {item: item});
+    }).then(() => {
+      this._view.selectedItem = item;
+      return this.start();
+    });
+  }
+
+  volumeChanged(volume) {
+    pps('system.setPlayerVolume', {volume: volume}).then(() => {
+      this._view.volume = volume;
+    });
+  }
+
+  speedChanged(speed) {
+    pps('system.setPlayerSpeed', {speed: speed}).then(() => {
+      this._view.speed = speed;
     });
   }
 
   start() {
-    this._audio.play();
-    this._view.playing = true;
+    return pps('system.setPlayerPlaying', {playing: true}).then(() => {
+      this._view.playing = true;
+    });
   }
 
   stop() {
-    this._audio.pause();
-    this._view.playing = false;
+    return pps('system.setPlayerPlaying', {playing: false}).then(() => {
+      this._view.playing = false;
+    });
   }
 
   finalize() {
