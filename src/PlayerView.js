@@ -8,7 +8,12 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+import SpeedHighIcon from 'material-ui/svg-icons/av/fast-forward';
+import SpeedLowIcon from 'material-ui/svg-icons/av/play-arrow';
+import VolumeHighIcon from 'material-ui/svg-icons/av/volume-up';
+import VolumeLowIcon from 'material-ui/svg-icons/av/volume-down';
 import Slider from 'material-ui/Slider';
+import './PlayerView.css';
 
 export default class PlayerView extends Component {
   state = {
@@ -94,8 +99,20 @@ export default class PlayerView extends Component {
             {this.state.selectedItem ? this.state.selectedItem.title : ''}
           </ToolbarGroup>
         </Toolbar>
-        <Slider min={0} max={1} step={0.01} value={this.state.volume} onChange={this._handleVolumeChange.bind(this)}/>
-        <Slider min={0.5} max={2} step={0.05} value={this.state.speed} onChange={this._handleSpeedChange.bind(this)}/>
+        <div class="sliderGroup">
+          <table>
+            <tr>
+              <td><VolumeLowIcon/></td>
+              <td class="sliderColumn"><Slider min={0} max={1} step={0.01} value={this.state.volume} onChange={this._handleVolumeChange.bind(this)}/></td>
+              <td><VolumeHighIcon/></td>
+            </tr>
+            <tr>
+              <td><SpeedLowIcon/></td>
+              <td class="sliderColumn"><Slider min={0.5} max={2} step={0.05} value={this.state.speed} onChange={this._handleSpeedChange.bind(this)}/></td>
+              <td><SpeedHighIcon/></td>
+            </tr>
+          </table>
+        </div>
         <List>
           {this.state.items.map(item => {
             return <ListItem
