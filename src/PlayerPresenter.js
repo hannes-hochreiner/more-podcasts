@@ -46,6 +46,10 @@ export default class PlayerPresenter {
       return pps('system.setPlayerItem', {item: item});
     }).then(() => {
       this._view.selectedItem = item;
+      return pps('system.getPlayerDuration');
+    }).then((res) => {
+      this._view.duration = res.duration;
+      this._view.currentTime = 0;
       return this.start();
     });
   }
@@ -62,15 +66,29 @@ export default class PlayerPresenter {
     });
   }
 
+  currentTimeChanged(currentTime) {
+    pps('system.setPlayerCurrentTime', {currentTime: currentTime});
+  }
+
   start() {
     return pps('system.setPlayerPlaying', {playing: true}).then(() => {
       this._view.playing = true;
+      this._intervalCancelToken = setInterval(this._updateCurrentTime.bind(this), 1000);
     });
   }
 
   stop() {
+    clearInterval(this._intervalCancelToken);
+    delete this._intervalCancelToken;
+
     return pps('system.setPlayerPlaying', {playing: false}).then(() => {
       this._view.playing = false;
+    });
+  }
+
+  _updateCurrentTime() {
+    pps('system.getPlayerCurrentTime').then(res => {
+      this._view.currentTime = res.currentTime;
     });
   }
 

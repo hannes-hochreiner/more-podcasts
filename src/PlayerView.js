@@ -21,7 +21,9 @@ export default class PlayerView extends Component {
     selectedItem: null,
     playing: false,
     volume: 0.5,
-    speed: 1.0
+    speed: 1.0,
+    currentTime: 0,
+    duration: 0
   };
 
   componentDidMount() {
@@ -62,6 +64,18 @@ export default class PlayerView extends Component {
     });
   }
 
+  get currentTime() {
+    return this.state.currentTime;
+  }
+
+  set currentTime(value) {
+    this.setState({ currentTime: value });
+  }
+
+  set duration(value) {
+    this.setState({ duration: value });
+  }
+
   _handleListItemClick(item) {
     this._pres.selectedItemChanged(item);
   }
@@ -72,6 +86,26 @@ export default class PlayerView extends Component {
 
   _handleSpeedChange(event, value) {
     this._pres.speedChanged(value);
+  }
+
+  _handleCurrentTimeChange(event, value) {
+    this.setState({ currentTime: value });
+    this._pres.currentTimeChanged(value);
+  }
+
+  _formatTime(value) {
+    let sec = `${Math.round(value % 60)}`;
+    let min = `${Math.floor(value / 60)}`;
+
+    if (sec.length == 1) {
+      sec = '0' + sec;
+    }
+
+    if (min.length == 1) {
+      min = '0' + min;
+    }
+
+    return `${min}:${sec}`;
   }
 
   render() {
@@ -99,18 +133,25 @@ export default class PlayerView extends Component {
             {this.state.selectedItem ? this.state.selectedItem.title : ''}
           </ToolbarGroup>
         </Toolbar>
-        <div class="sliderGroup">
+        <div className="sliderGroup">
           <table>
-            <tr>
-              <td><VolumeLowIcon/></td>
-              <td class="sliderColumn"><Slider min={0} max={1} step={0.01} value={this.state.volume} onChange={this._handleVolumeChange.bind(this)}/></td>
-              <td><VolumeHighIcon/></td>
-            </tr>
-            <tr>
-              <td><SpeedLowIcon/></td>
-              <td class="sliderColumn"><Slider min={0.5} max={2} step={0.05} value={this.state.speed} onChange={this._handleSpeedChange.bind(this)}/></td>
-              <td><SpeedHighIcon/></td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>{this._formatTime(this.state.currentTime)}</td>
+                <td className="sliderColumn"><Slider min={0} max={this.state.duration} step={1} value={this.state.currentTime} onChange={this._handleCurrentTimeChange.bind(this)}/></td>
+                <td>{this._formatTime(this.state.duration)}</td>
+              </tr>
+              <tr>
+                <td><VolumeLowIcon/></td>
+                <td className="sliderColumn"><Slider min={0} max={1} step={0.01} value={this.state.volume} onChange={this._handleVolumeChange.bind(this)}/></td>
+                <td><VolumeHighIcon/></td>
+              </tr>
+              <tr>
+                <td><SpeedLowIcon/></td>
+                <td className="sliderColumn"><Slider min={0.5} max={2} step={0.05} value={this.state.speed} onChange={this._handleSpeedChange.bind(this)}/></td>
+                <td><SpeedHighIcon/></td>
+              </tr>
+            </tbody>
           </table>
         </div>
         <List>
