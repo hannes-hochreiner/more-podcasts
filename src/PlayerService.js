@@ -6,6 +6,7 @@ export default class PlayerService {
     this.audio = new Audio();
     this.audio.onloadeddata = this._handleLoadedData.bind(this);
     this.audio.onerror = this._handleError.bind(this);
+    this.audio.onended = this._handleEnded.bind(this);
     PubSub.subscribe('system.setPlayerItem.request', this.setPlayerItem.bind(this));
     PubSub.subscribe('system.getPlayerItem.request', this.getPlayerItem.bind(this));
     PubSub.subscribe('system.setPlayerSpeed.request', this.setPlayerSpeed.bind(this));
@@ -17,6 +18,10 @@ export default class PlayerService {
     PubSub.subscribe('system.setPlayerCurrentTime.request', this.setPlayerCurrentTime.bind(this));
     PubSub.subscribe('system.getPlayerCurrentTime.request', this.getPlayerCurrentTime.bind(this));
     PubSub.subscribe('system.getPlayerDuration.request', this.getPlayerDuration.bind(this));
+  }
+
+  _handleEnded() {
+    PubSub.publish('event.playerEnded');
   }
 
   _handleLoadedData() {

@@ -6,7 +6,9 @@ export default class PlayerPresenter {
     this._view = view;
 
     this._updateCurrentState();
-    this._updatePlayList();
+    this._getPlayList().then(res => {
+      this._view.items = res;
+    });
   }
 
   _updateCurrentState() {
@@ -23,7 +25,7 @@ export default class PlayerPresenter {
     });
   }
 
-  _updatePlayList() {
+  _getPlayList() {
     return pps('system.getAllEnclosureDocs').then(res => {
       return Promise.all(res.enclosureDocs.filter(enc => {
         return typeof enc._attachments !== 'undefined';
@@ -31,7 +33,11 @@ export default class PlayerPresenter {
         return pps('system.getItemByChannelIdId', {channelId: enc.channelId, id: enc.itemId});
       }));
     }).then(res => {
-      this._view.items = res.map(itm => { return itm.item; }).sort((itm1, itm2) => {
+      return res.map(itm => {
+        return itm.item;
+      }).filter(itm => {
+        return typeof itm.playCount === 'undefined';
+      }).sort((itm1, itm2) => {
         return itm1.date.localeCompare(itm2.date);
       });
     });
@@ -71,6 +77,8 @@ export default class PlayerPresenter {
   }
 
   start() {
+    this._endedToken = PubSub.subscribe('event.playerEnded', this._handleEnded.bind(this));
+
     return pps('system.setPlayerPlaying', {playing: true}).then(() => {
       this._view.playing = true;
       this._intervalCancelToken = setInterval(this._updateCurrentTime.bind(this), 1000);
@@ -80,6 +88,8 @@ export default class PlayerPresenter {
   stop() {
     clearInterval(this._intervalCancelToken);
     delete this._intervalCancelToken;
+    PubSub.unsubscribe(this._endedToken);
+    delete this._endedToken;
 
     return pps('system.setPlayerPlaying', {playing: false}).then(() => {
       this._view.playing = false;
@@ -89,6 +99,27 @@ export default class PlayerPresenter {
   _updateCurrentTime() {
     pps('system.getPlayerCurrentTime').then(res => {
       this._view.currentTime = res.currentTime;
+    });
+  }
+
+  _handleEnded() {
+    this.stop().then(() => {
+      return pps('system.getPlayerItem');
+    }).then(res => {
+      let item = res.item;
+
+      if (item.playCount) {
+        item.playCount += 1;
+      } else {
+        item.playCount = 1;
+      }
+
+      return pps('system.addOrUpdateItem', {item: item});
+    }).then(() => {
+      return this._getPlayList();
+    }).then(res => {
+      this._view.items = res;
+      this.selectedItemChanged(res[0]);
     });
   }
 
