@@ -6,6 +6,7 @@ export default class NavigationService {
     PubSub.subscribe('system.goToPlayerPage.request', this.goToPlayerPage.bind(this));
     PubSub.subscribe('system.goToChannelListPage.request', this.goToChannelListPage.bind(this));
     PubSub.subscribe('system.goToChannelPage.request', this.goToChannelPage.bind(this));
+    PubSub.subscribe('system.goToInfoPage.request', this.goToInfoPage.bind(this));
   }
 
   goToChannelPage(topic, data) {
@@ -18,5 +19,9 @@ export default class NavigationService {
 
   goToPlayerPage(topic, data) {
     (new Router()).history.push(`/player`);
+  }
+
+  goToInfoPage(topic, data) {
+    (new Router()).history.push(`/info`);
   }
 }

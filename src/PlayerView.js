@@ -126,6 +126,7 @@ export default class PlayerView extends Component {
       targetOrigin={{horizontal: 'left', vertical: 'top'}}
     >
       <MenuItem primaryText="channels" onClick={() => {this._pres.goToChannelListPage();}}/>
+      <MenuItem primaryText="info" onClick={() => {this._pres.goToInfoPage();}}/>
     </IconMenu>;
 
     let itemMenu = (item) => {

@@ -23,6 +23,8 @@ import PlayerView from './PlayerView';
 import PlayerService from './PlayerService';
 import ps from './PubSub';
 import np from './NotificationPresenter';
+import ip from './InfoPresenter';
+import InfoView from './InfoView';
 
 let pouchChannels = new pouchdb('more-podcasts_channelRepository');
 let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
@@ -31,6 +33,7 @@ ps.ps = PubSub;
 ps.uuid = uuid;
 
 np.ps = ps;
+ip.ps = ps;
 
 new ChannelRepository(pouchChannels, PubSub);
 new EnclosureRepository(pouchEnclosures, PubSub);
@@ -52,6 +55,7 @@ ReactDOM.render(
         <Route exact path="/channels" component={ChannelListView}/>
         <Route exact path="/channels/:channelId" component={ChannelView}/>
         <Route exact path="/player" component={PlayerView}/>
+        <Route exact path="/info" component={InfoView}/>
       </Switch>
     </App>
   </Router>, document.getElementById('root'));

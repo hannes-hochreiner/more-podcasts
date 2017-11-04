@@ -41,6 +41,10 @@ export default class PlayerPresenter {
     PubSub.publish('system.goToChannelListPage.request');
   }
 
+  goToInfoPage() {
+    PubSub.publish('system.goToInfoPage.request');
+  }
+
   selectedItemChanged(item) {
     return pps('system.playerService.setItem', {item: item}).then(() => {
       return this._updateCurrentState();
