@@ -48,7 +48,7 @@ export default class PlayerPresenter {
   }
 
   selectedItemChanged(item) {
-    this.stop().then(() => {
+    return this.stop().then(() => {
       return pps('system.getItemByChannelIdId', {id: item.id, channelId: item.channelId});
     }).then(res => {
       return pps('system.setPlayerItem', {item: res.item}).then(() => {
@@ -132,7 +132,11 @@ export default class PlayerPresenter {
     this.stop().then(() => {
       return pps('system.getPlayerItem');
     }).then(res => {
+      return pps('system.getItemByChannelIdId', {id: res.item.id, channelId: res.item.channelId});
+    }).then(res => {
       let item = res.item;
+
+      delete item.currentTime;
 
       if (item.playCount) {
         item.playCount += 1;
@@ -145,7 +149,9 @@ export default class PlayerPresenter {
       return this._getPlayList();
     }).then(res => {
       this._view.items = res;
-      this.selectedItemChanged(res[0]);
+      return this.selectedItemChanged(res[0]);
+    }).then(() => {
+      return this.start();
     });
   }
 
