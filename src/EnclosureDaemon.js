@@ -15,8 +15,8 @@ export default class EnclosureDaemon {
     let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     let connectionTypeCheck = connection.type && !(connection.type === 'ethernet' || connection.type === 'wifi');
     let connectionSaveDataCheck = connection.saveData;
-    
-    if (connection && (connectionTypeCheck || connectionSaveDataCheck) {
+
+    if (connection && (connectionTypeCheck || connectionSaveDataCheck)) {
       return;
     }
 
