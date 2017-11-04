@@ -49,27 +49,35 @@ export default class PlayerPresenter {
 
   selectedItemChanged(item) {
     this.stop().then(() => {
-      return pps('system.setPlayerItem', {item: item});
-    }).then(() => {
-      this._view.selectedItem = item;
-      return pps('system.getPlayerDuration');
-    }).then((res) => {
-      this._view.duration = res.duration;
-      this._view.currentTime = 0;
-      return this.start();
+      return pps('system.getItemByChannelIdId', {id: item.id, channelId: item.channelId});
+    }).then(res => {
+      return pps('system.setPlayerItem', {item: res.item}).then(() => {
+        let item = res.item;
+        this._view.selectedItem = item;
+
+        return pps('system.getPlayerDuration').then((res) => {
+          this._view.duration = res.duration;
+
+          let currentTime = 0;
+
+          if (item.currentTime) {
+            currentTime = item.currentTime;
+          }
+
+          this._view.currentTime = currentTime;
+
+          return pps('system.setPlayerCurrentTime', {currentTime: currentTime});
+        });
+      });
     });
   }
 
   volumeChanged(volume) {
-    pps('system.setPlayerVolume', {volume: volume}).then(() => {
-      this._view.volume = volume;
-    });
+    pps('system.setPlayerVolume', {volume: volume});
   }
 
   speedChanged(speed) {
-    pps('system.setPlayerSpeed', {speed: speed}).then(() => {
-      this._view.speed = speed;
-    });
+    pps('system.setPlayerSpeed', {speed: speed});
   }
 
   currentTimeChanged(currentTime) {
@@ -91,8 +99,26 @@ export default class PlayerPresenter {
     PubSub.unsubscribe(this._endedToken);
     delete this._endedToken;
 
-    return pps('system.setPlayerPlaying', {playing: false}).then(() => {
+    return Promise.all([
+      pps('system.getPlayerItem'),
+      pps('system.setPlayerPlaying', {playing: false})
+    ]).then(res => {
       this._view.playing = false;
+      let item = res[0].item;
+
+      if (!item) {
+        return;
+      }
+
+      return Promise.all([
+        pps('system.getItemByChannelIdId', {id: item.id, channelId: item.channelId}),
+        pps('system.getPlayerCurrentTime')
+      ]).then(res => {
+        let item = res[0].item;
+        item.currentTime = res[1].currentTime;
+
+        return pps('system.addOrUpdateItem', {item: item});
+      });
     });
   }
 

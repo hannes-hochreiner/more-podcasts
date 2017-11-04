@@ -81,10 +81,12 @@ export default class PlayerView extends Component {
   }
 
   _handleVolumeChange(event, value) {
+    this.setState({ volume: value });
     this._pres.volumeChanged(value);
   }
 
   _handleSpeedChange(event, value) {
+    this.setState({ speed: value });
     this._pres.speedChanged(value);
   }
 
