@@ -96,6 +96,14 @@ export default class PlayerView extends Component {
     this._pres.currentTimeChanged(value);
   }
 
+  _handleEnclosureRefresh(item, event) {
+    this._pres.refreshEnclosure(item);
+  }
+
+  _handleEnclosureDelete(item, event) {
+    this._pres.deleteEnclosure(item);
+  }
+
   _formatTime(value) {
     let sec = `${Math.round(value % 60)}`;
     let min = `${Math.floor(value / 60)}`;
@@ -120,14 +128,16 @@ export default class PlayerView extends Component {
       <MenuItem primaryText="channels" onClick={() => {this._pres.goToChannelListPage();}}/>
     </IconMenu>;
 
-    const itemMenu = <IconMenu
-      iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-      anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-      targetOrigin={{horizontal: 'right', vertical: 'top'}}
-    >
-      <MenuItem primaryText="refresh" />
-      <MenuItem primaryText="delete" />
-    </IconMenu>;
+    let itemMenu = (item) => {
+      return (<IconMenu
+        iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+        anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+        targetOrigin={{horizontal: 'right', vertical: 'top'}}
+      >
+        <MenuItem primaryText="refresh" onClick={this._handleEnclosureRefresh.bind(this, item)}/>
+        <MenuItem primaryText="delete" onClick={this._handleEnclosureDelete.bind(this, item)} />
+      </IconMenu>);
+    }
 
     return (
       <div>
@@ -172,7 +182,7 @@ export default class PlayerView extends Component {
               key={item.id}
               primaryText={item.title}
               onClick={this._handleListItemClick.bind(this, item)}
-              rightIconButton={itemMenu}
+              rightIconButton={itemMenu(item)}
             />;
           })}
         </List>

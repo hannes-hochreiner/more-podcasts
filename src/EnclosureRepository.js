@@ -5,10 +5,11 @@ export default class EnclosureRepository {
 
     this._ps.subscribe('system.getAllEnclosureDocs.request', this.getAllEnclosureDocs.bind(this));
     this._ps.subscribe('system.getEnclosureDocsByChannelId.request', this.getEnclosureDocsByChannelId.bind(this));
+    this._ps.subscribe('system.removeEnclosureBinaryByChannelIdItemId.request', this.removeEnclosureBinaryByChannelIdItemId.bind(this));
     this._ps.subscribe('system.getEnclosureBinaryByChannelIdItemId.request', this.getEnclosureBinaryByChannelIdItemId.bind(this));
     this._ps.subscribe('system.addOrUpdateEnclosureDoc.request', this.addOrUpdateEnclosureDoc.bind(this));
     this._ps.subscribe('system.addOrUpdateEnclosureBinary.request', this.addOrUpdateEnclosureBinary.bind(this));
-    this._ps.subscribe('system.removeEnclosureDocAndBinary.request', this.removeEnclosureDocAndBinary.bind(this));
+    this._ps.subscribe('system.removeEnclosureDocAndBinaryByChannelItemId.request', this.removeEnclosureDocAndBinaryByChannelItemId.bind(this));
   }
 
   getAllEnclosureDocs(topic, data) {
@@ -86,10 +87,24 @@ export default class EnclosureRepository {
     });
   }
 
-  removeEnclosureDocAndBinary(topic, data) {
-    let respId = `system.removeEnclosureDocAndBinary.response.${topic.split('.')[3]}`;
+  removeEnclosureBinaryByChannelIdItemId(topic, data) {
+    let respId = `system.removeEnclosureBinaryByChannelIdItemId.response.${topic.split('.')[3]}`;
 
-    this._pouch.remove(data.enclosureDoc).then(() => {
+    this._pouch.get(`enclosures/${data.channelId}/${data.itemId}`).then(enclDoc => {
+      return this._pouch.removeAttachment(enclDoc._id, 'enclosure', enclDoc._rev);
+    }).then(() => {
+      this._ps.publish(respId);
+    }).catch(err => {
+      this._ps.publish(respId, {error: err});
+    });
+  }
+
+  removeEnclosureDocAndBinaryByChannelItemId(topic, data) {
+    let respId = `system.removeEnclosureDocAndBinaryByChannelItemId.response.${topic.split('.')[3]}`;
+
+    this._pouch.get(`enclosures/${data.channelId}/${data.itemId}`).then(enclDoc => {
+      return this._pouch.remove(enclDoc);
+    }).then(() => {
       this._ps.publish(respId);
     }).catch(err => {
       this._ps.publish(respId, {error: err});

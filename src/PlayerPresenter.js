@@ -15,6 +15,28 @@ export default class PlayerPresenter {
     });
   }
 
+  refreshEnclosure(item) {
+    return pps('system.removeEnclosureBinaryByChannelIdItemId', {
+      channelId: item.channelId,
+      itemId: item.id
+    }).then(() => {
+      return pps('system.playerService.getStatus');
+    }).then(res => {
+      this._handleStatusChange(null, res);
+    });
+  }
+
+  deleteEnclosure(item) {
+    return pps('system.removeEnclosureDocAndBinaryByChannelItemId', {
+      channelId: item.channelId,
+      itemId: item.id
+    }).then(() => {
+      return pps('system.playerService.getStatus');
+    }).then(res => {
+      this._handleStatusChange(null, res);
+    });
+  }
+
   goToChannelListPage() {
     PubSub.publish('system.goToChannelListPage.request');
   }
