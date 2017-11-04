@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import AuthenticationDialog from './AuthenticationDialog';
+import NotificationView from './NotificationView';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -23,6 +24,7 @@ class App extends Component {
         <div>
           <AuthenticationDialog/>
           {this.props.children}
+          <NotificationView/>
         </div>
       </MuiThemeProvider>
     );

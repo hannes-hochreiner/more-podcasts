@@ -22,12 +22,15 @@ import EnclosureDaemon from './EnclosureDaemon';
 import PlayerView from './PlayerView';
 import PlayerService from './PlayerService';
 import ps from './PubSub';
+import np from './NotificationPresenter';
 
 let pouchChannels = new pouchdb('more-podcasts_channelRepository');
 let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
 
 ps.ps = PubSub;
 ps.uuid = uuid;
+
+np.ps = ps;
 
 new ChannelRepository(pouchChannels, PubSub);
 new EnclosureRepository(pouchEnclosures, PubSub);

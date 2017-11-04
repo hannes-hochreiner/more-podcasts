@@ -13,6 +13,7 @@ import SpeedLowIcon from 'material-ui/svg-icons/av/play-arrow';
 import VolumeHighIcon from 'material-ui/svg-icons/av/volume-up';
 import VolumeLowIcon from 'material-ui/svg-icons/av/volume-down';
 import Slider from 'material-ui/Slider';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import './PlayerView.css';
 
 export default class PlayerView extends Component {
@@ -119,6 +120,15 @@ export default class PlayerView extends Component {
       <MenuItem primaryText="channels" onClick={() => {this._pres.goToChannelListPage();}}/>
     </IconMenu>;
 
+    const itemMenu = <IconMenu
+      iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+      anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+      targetOrigin={{horizontal: 'right', vertical: 'top'}}
+    >
+      <MenuItem primaryText="refresh" />
+      <MenuItem primaryText="delete" />
+    </IconMenu>;
+
     return (
       <div>
         <AppBar title="player" iconElementLeft={menu}/>
@@ -162,6 +172,7 @@ export default class PlayerView extends Component {
               key={item.id}
               primaryText={item.title}
               onClick={this._handleListItemClick.bind(this, item)}
+              rightIconButton={itemMenu}
             />;
           })}
         </List>

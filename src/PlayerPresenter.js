@@ -22,6 +22,14 @@ export default class PlayerPresenter {
   selectedItemChanged(item) {
     return pps('system.playerService.setItem', {item: item}).then(() => {
       return this._updateCurrentState();
+    }).catch(error => {
+      let message = 'error loading item';
+
+      if (error.message) {
+        message = error.message;
+      }
+
+      PubSub.publish('user.notification.showError', {error: {message: message}});
     });
   }
 
