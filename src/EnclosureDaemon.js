@@ -13,8 +13,10 @@ export default class EnclosureDaemon {
     }
 
     let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-
-    if (connection && connection.type && (connection.type !== 'ethernet' || connection.type !== 'wifi')) {
+    let connectionTypeCheck = connection.type && !(connection.type === 'ethernet' || connection.type === 'wifi');
+    let connectionSaveDataCheck = connection.saveData;
+    
+    if (connection && (connectionTypeCheck || connectionSaveDataCheck) {
       return;
     }
 
