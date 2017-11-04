@@ -9,6 +9,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import {default as pouchdb} from 'pouchdb';
 import PubSub from 'pubsub-js';
+import uuid from 'uuid';
 
 import AuthenticationService from './AuthenticationService';
 import ConsoleLogger from './ConsoleLogger';
@@ -20,9 +21,13 @@ import EnclosureRepository from './EnclosureRepository';
 import EnclosureDaemon from './EnclosureDaemon';
 import PlayerView from './PlayerView';
 import PlayerService from './PlayerService';
+import ps from './PubSub';
 
 let pouchChannels = new pouchdb('more-podcasts_channelRepository');
 let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
+
+ps.ps = PubSub;
+ps.uuid = uuid;
 
 new ChannelRepository(pouchChannels, PubSub);
 new EnclosureRepository(pouchEnclosures, PubSub);
@@ -32,7 +37,7 @@ new ChannelService();
 new ChannelSyncService();
 new NavigationService();
 new EnclosureDaemon();
-new PlayerService();
+new PlayerService(ps);
 
 injectTapEventPlugin();
 

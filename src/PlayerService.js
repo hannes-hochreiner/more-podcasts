@@ -2,103 +2,189 @@ import PubSub from 'pubsub-js';
 import {promisedPubSub as pps} from './utils';
 
 export default class PlayerService {
-  constructor() {
+  constructor(ps) {
+    this.ps = ps;
     this.audio = new Audio();
-    this.audio.onloadeddata = this._handleLoadedData.bind(this);
-    this.audio.onerror = this._handleError.bind(this);
     this.audio.onended = this._handleEnded.bind(this);
-    PubSub.subscribe('system.setPlayerItem.request', this.setPlayerItem.bind(this));
-    PubSub.subscribe('system.getPlayerItem.request', this.getPlayerItem.bind(this));
-    PubSub.subscribe('system.setPlayerSpeed.request', this.setPlayerSpeed.bind(this));
-    PubSub.subscribe('system.getPlayerSpeed.request', this.getPlayerSpeed.bind(this));
-    PubSub.subscribe('system.setPlayerVolume.request', this.setPlayerVolume.bind(this));
-    PubSub.subscribe('system.getPlayerVolume.request', this.getPlayerVolume.bind(this));
-    PubSub.subscribe('system.setPlayerPlaying.request', this.setPlayerPlaying.bind(this));
-    PubSub.subscribe('system.getPlayerPlaying.request', this.getPlayerPlaying.bind(this));
-    PubSub.subscribe('system.setPlayerCurrentTime.request', this.setPlayerCurrentTime.bind(this));
-    PubSub.subscribe('system.getPlayerCurrentTime.request', this.getPlayerCurrentTime.bind(this));
-    PubSub.subscribe('system.getPlayerDuration.request', this.getPlayerDuration.bind(this));
+    this.ps.reg('system.playerService.getStatus', this.getStatus.bind(this));
+    this.ps.reg('system.playerService.setItem', this.setItem.bind(this));
+    this.ps.reg('system.playerService.getItem', this.getItem.bind(this));
+    this.ps.reg('system.playerService.setSpeed', this.setSpeed.bind(this));
+    this.ps.reg('system.playerService.getSpeed', this.getSpeed.bind(this));
+    this.ps.reg('system.playerService.setVolume', this.setVolume.bind(this));
+    this.ps.reg('system.playerService.getVolume', this.getVolume.bind(this));
+    this.ps.reg('system.playerService.setPlaying', this.setPlaying.bind(this));
+    this.ps.reg('system.playerService.getPlaying', this.getPlaying.bind(this));
+    this.ps.reg('system.playerService.setCurrentTime', this.setCurrentTime.bind(this));
+    this.ps.reg('system.playerService.getCurrentTime', this.getCurrentTime.bind(this));
+    this.ps.reg('system.playerService.getDuration', this.getDuration.bind(this));
+    this.ps.reg('system.playerService.getPlaylist', this.getPlaylist.bind(this));
   }
 
   _handleEnded() {
-    PubSub.publish('event.playerEnded');
+    let statusObj = {};
+
+    this.audio.pause();
+
+    this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}).then(res => {
+      let item = res.item;
+
+      delete item.currentTime;
+
+      if (item.playCount) {
+        item.playCount += 1;
+      } else {
+        item.playCount = 1;
+      }
+
+      return this.ps.prom('system.addOrUpdateItem', {item: item});
+    }).then(() => {
+      return this.getPlaylist();
+    }).then(res => {
+      statusObj.playlist = res.playlist;
+      statusObj.item = res.playlist[0];
+      return this.setItem(null, null, null, null, {item:res.playlist[0]});
+    }).then(() => {
+      return this.setPlaying(null, null, null, null, {playing: true});
+    }).then(() => {
+      statusObj.playing = !this.audio.paused;
+      statusObj.speed = this.audio.playbackRate;
+      statusObj.volume = this.audio.volume;
+      statusObj.currentTime = this.audio.currentTime;
+      statusObj.duration = this.audio.duration;
+      this.ps.pub('system.playerService.statusChanged', {status: statusObj});
+    });
   }
 
-  _handleLoadedData() {
-    if (this._respTopic) {
-      let topic = this._respTopic;
-      delete this._respTopic;
-      PubSub.publish(topic);
-    }
+  getStatus(realm, component, topic, id, data) {
+    return this.getPlaylist().then(res => {
+      return {
+        status: {
+          item: this.item,
+          speed: this.audio.playbackRate,
+          volume: this.audio.volume,
+          playing: !this.audio.paused,
+          currentTime: this.audio.currentTime,
+          duration: this.audio.duration,
+          playlist: res.playlist
+        }
+      };
+    });
   }
 
-  _handleError() {
-    if (this._respTopic) {
-      let topic = this._respTopic;
-      delete this._respTopic;
-      PubSub.publish(topic, {error: {message: "could not play item"}});
-    }
+  getPlaylist(realm, component, topic, id, data) {
+    return this.ps.prom('system.getAllEnclosureDocs').then(res => {
+      return Promise.all(res.enclosureDocs.filter(enc => {
+        return typeof enc._attachments !== 'undefined';
+      }).map(enc => {
+        return this.ps.prom('system.getItemByChannelIdId', {channelId: enc.channelId, id: enc.itemId});
+      }));
+    }).then(res => {
+      return {
+        playlist: res.map(itm => {
+          return itm.item;
+        }).filter(itm => {
+          return typeof itm.playCount === 'undefined';
+        }).sort((itm1, itm2) => {
+          return itm1.date.localeCompare(itm2.date);
+        })
+      };
+    });
   }
 
-  setPlayerItem(topic, data) {
-    this._respTopic = `system.setPlayerItem.response.${topic.split('.')[3]}`;
-    this.item = data.item;
+  _setSource(enclosure) {
+    return new Promise((resolve, reject) => {
+      this.audio.onloadeddata = () => {
+        delete this.audio.onloadeddata;
+        resolve();
+      };
+      this.audio.onerror = (e) => {
+        delete this.audio.onerror;
+        reject(e);
+      };
 
-    pps('system.getEnclosureBinaryByChannelIdItemId', {channelId: this.item.channelId, itemId: this.item.id}).then(res => {
       if (this.audio.src) {
         URL.revokeObjectURL(this.audio.src);
       }
 
-      this.audio.src = URL.createObjectURL(res.enclosure);
-    }).catch(err => {
+      this.audio.src = URL.createObjectURL(enclosure);
     });
   }
 
-  getPlayerItem(topic, data) {
-    PubSub.publish(`system.getPlayerItem.response.${topic.split('.')[3]}`, {item: this.item});
+  setItem(realm, component, topic, id, data) {
+    this.item = data.item;
+
+    return Promise.all([
+      this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}),
+      this.ps.prom('system.getEnclosureBinaryByChannelIdItemId', {channelId: this.item.channelId, itemId: this.item.id})
+    ]).then(res => {
+      this.item = res[0].item;
+
+      return this._setSource(res[1].enclosure).then(() => {
+        let currentTime = 0;
+
+        if (this.item.currentTime) {
+          currentTime = this.item.currentTime;
+        }
+
+        this.audio.currentTime = currentTime;
+      });
+    });
   }
 
-  setPlayerSpeed(topic, data) {
+  getItem(realm, component, topic, id, data) {
+    return {item: this.item};
+  }
+
+  setSpeed(realm, component, topic, id, data) {
     this.audio.playbackRate = data.speed;
-    PubSub.publish(`system.setPlayerSpeed.response.${topic.split('.')[3]}`);
   }
 
-  getPlayerSpeed(topic, data) {
-    PubSub.publish(`system.getPlayerSpeed.response.${topic.split('.')[3]}`, {speed: this.audio.playbackRate});
+  getSpeed(realm, component, topic, id, data) {
+    return {speed: this.audio.playbackRate};
   }
 
-  setPlayerVolume(topic, data) {
+  setVolume(realm, component, topic, id, data) {
     this.audio.volume = data.volume;
-    PubSub.publish(`system.setPlayerVolume.response.${topic.split('.')[3]}`);
   }
 
-  getPlayerVolume(topic, data) {
-    PubSub.publish(`system.getPlayerVolume.response.${topic.split('.')[3]}`, {volume: this.audio.volume});
+  getVolume(realm, component, topic, id, data) {
+    return {volume: this.audio.volume};
   }
 
-  setPlayerPlaying(topic, data) {
+  setPlaying(realm, component, topic, id, data) {
+    if (!this.item) {
+      return new Promise((resolve, reject) => { reject(new Error("No item set for playing.")); })
+    }
+
     if (data.playing) {
       this.audio.play();
-    } else {
-      this.audio.pause();
+      return new Promise((resolve, reject) => { resolve(); })
     }
-    PubSub.publish(`system.setPlayerPlaying.response.${topic.split('.')[3]}`);
+
+    this.audio.pause();
+    return this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}).then(res => {
+      let item = res.item;
+
+      item.currentTime = this.audio.currentTime;
+
+      return this.ps.prom('system.addOrUpdateItem', {item: item});
+    });
   }
 
-  getPlayerPlaying(topic, data) {
-    PubSub.publish(`system.getPlayerPlaying.response.${topic.split('.')[3]}`, {playing: !this.audio.paued});
+  getPlaying(realm, component, topic, id, data) {
+    return {playing: !this.audio.paued};
   }
 
-  setPlayerCurrentTime(topic, data) {
+  setCurrentTime(realm, component, topic, id, data) {
     this.audio.currentTime = data.currentTime;
-    PubSub.publish(`system.setPlayerCurrentTime.response.${topic.split('.')[3]}`);
   }
 
-  getPlayerCurrentTime(topic, data) {
-    PubSub.publish(`system.getPlayerCurrentTime.response.${topic.split('.')[3]}`, {currentTime: this.audio.currentTime});
+  getCurrentTime(realm, component, topic, id, data) {
+    return {currentTime: this.audio.currentTime};
   }
 
-  getPlayerDuration(topic, data) {
-    PubSub.publish(`system.getPlayerDuration.response.${topic.split('.')[3]}`, {duration: this.audio.duration});
+  getDuration(realm, component, topic, id, data) {
+    return {duration: this.audio.duration};
   }
 }
