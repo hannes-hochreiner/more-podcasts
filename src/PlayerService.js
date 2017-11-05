@@ -7,7 +7,6 @@ export default class PlayerService {
     this.audio = new Audio();
     this.audio.addEventListener('play', this._handlePlay.bind(this));
     this.audio.addEventListener('pause', this._handlePause.bind(this));
-    this.audio.onended = this._handleEnded.bind(this);
     this.ps.reg('system.playerService.getStatus', this.getStatus.bind(this));
     this.ps.reg('system.playerService.setItem', this.setItem.bind(this));
     this.ps.reg('system.playerService.getItem', this.getItem.bind(this));
@@ -46,28 +45,18 @@ export default class PlayerService {
   }
 
   _handlePause() {
-    if (this.currentTimeIntervalId) {
-      clearInterval(this.currentTimeIntervalId);
+    if (!this.audio.ended) {
+      if (this.currentTimeIntervalId) {
+        clearInterval(this.currentTimeIntervalId);
+      }
+
+      return this._updateCurrentTimeForItem(this.audio.currentTime, this.item).then(() => {
+        return this.getStatus();
+      }).then(res => {
+        this.ps.pub('system.playerService.statusChanged', res);
+      });
     }
 
-    return this._updateCurrentTimeForItem(this.audio.currentTime, this.item).then(() => {
-      return this.getStatus();
-    }).then(res => {
-      this.ps.pub('system.playerService.statusChanged', res);
-    });
-  }
-
-  _handlePlay() {
-    if (!this.currentTimeIntervalId) {
-      this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
-    }
-
-    return this.getStatus().then(res => {
-      this.ps.pub('system.playerService.statusChanged', res);
-    });
-  }
-
-  _handleEnded() {
     let statusObj = {};
 
     this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}).then(res => {
@@ -97,6 +86,16 @@ export default class PlayerService {
       statusObj.currentTime = this.audio.currentTime;
       statusObj.duration = this.audio.duration;
       this.ps.pub('system.playerService.statusChanged', {status: statusObj});
+    });
+  }
+
+  _handlePlay() {
+    if (!this.currentTimeIntervalId) {
+      this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
+    }
+
+    return this.getStatus().then(res => {
+      this.ps.pub('system.playerService.statusChanged', res);
     });
   }
 
