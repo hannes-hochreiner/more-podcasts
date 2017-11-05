@@ -58,12 +58,12 @@ export default class PlayerService {
   }
 
   _handlePlay() {
-    return new Promise((resolve, reject) => {
-      if (!this.currentTimeIntervalId) {
-        this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
-      }
+    if (!this.currentTimeIntervalId) {
+      this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
+    }
 
-      resolve();
+    return this.getStatus().then(res => {
+      this.ps.pub('system.playerService.statusChanged', res);
     });
   }
 
