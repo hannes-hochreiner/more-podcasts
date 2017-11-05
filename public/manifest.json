@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "more podcasts",
+  "name": "a simple app for listening to podcast",
   "icons": [
     {
       "src": "favicon.ico",
