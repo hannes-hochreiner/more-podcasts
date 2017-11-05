@@ -5,6 +5,8 @@ export default class PlayerService {
   constructor(ps) {
     this.ps = ps;
     this.audio = new Audio();
+    this.audio.addEventListener('play', this._handlePlay.bind(this));
+    this.audio.addEventListener('pause', this._handlePause.bind(this));
     this.audio.onended = this._handleEnded.bind(this);
     this.ps.reg('system.playerService.getStatus', this.getStatus.bind(this));
     this.ps.reg('system.playerService.setItem', this.setItem.bind(this));
@@ -19,12 +21,54 @@ export default class PlayerService {
     this.ps.reg('system.playerService.getCurrentTime', this.getCurrentTime.bind(this));
     this.ps.reg('system.playerService.getDuration', this.getDuration.bind(this));
     this.ps.reg('system.playerService.getPlaylist', this.getPlaylist.bind(this));
+
+    this.getPlaylist().then(res => {
+      if (res.playlist.length === 0) {
+        return;
+      }
+
+      return this.setItem(null, null, null, null, {item: res.playlist[0]}).then(() => {
+        this.ps.pub('system.playerService.statusChanged', {status: {
+          playlist: res.playlist,
+          item: res.playlist[0],
+          playing: !this.audio.paused,
+          speed: this.audio.playbackRate,
+          volume: this.audio.volume,
+          currentTime: this.audio.currentTime,
+          duration: this.audio.duration
+        }});
+      });
+    });
+  }
+
+  _handleCurrentTimeUpdate() {
+    return this._updateCurrentTimeForItem(this.audio.currentTime, this.item);
+  }
+
+  _handlePause() {
+    if (this.currentTimeIntervalId) {
+      clearInterval(this.currentTimeIntervalId);
+    }
+
+    return this._updateCurrentTimeForItem(this.audio.currentTime, this.item).then(() => {
+      return this.getStatus();
+    }).then(res => {
+      this.ps.pub('system.playerService.statusChanged', res);
+    });
+  }
+
+  _handlePlay() {
+    return new Promise((resolve, reject) => {
+      if (!this.currentTimeIntervalId) {
+        this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
+      }
+
+      resolve();
+    });
   }
 
   _handleEnded() {
     let statusObj = {};
-
-    this.audio.pause();
 
     this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}).then(res => {
       let item = res.item;
@@ -94,14 +138,19 @@ export default class PlayerService {
 
   _setSource(enclosure) {
     return new Promise((resolve, reject) => {
-      this.audio.onloadeddata = () => {
-        delete this.audio.onloadeddata;
+      let canplaythroughFun = () => {
+        this.audio.removeEventListener('canplaythrough', canplaythroughFun);
+        this.audio.removeEventListener('error', errorFun);
         resolve();
       };
-      this.audio.onerror = (e) => {
-        delete this.audio.onerror;
+      let errorFun = (e) => {
+        this.audio.removeEventListener('canplaythrough', canplaythroughFun);
+        this.audio.removeEventListener('error', errorFun);
         reject(e);
       };
+
+      this.audio.addEventListener('canplaythrough', canplaythroughFun);
+      this.audio.addEventListener('error', errorFun);
 
       if (this.audio.src) {
         URL.revokeObjectURL(this.audio.src);
@@ -158,17 +207,28 @@ export default class PlayerService {
     }
 
     if (data.playing) {
+      this.audio.removeEventListener('play', this._handlePlay.bind(this));
       this.audio.play();
-      return new Promise((resolve, reject) => { resolve(); })
+      
+      return this._handlePlay().then(() => {
+        this.audio.addEventListener('play', this._handlePlay.bind(this));
+      });
     }
 
+    this.audio.removeEventListener('pause', this._handlePause.bind(this));
     this.audio.pause();
-    return this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}).then(res => {
-      let item = res.item;
+    return this._handlePause().then(() => {
+      this.audio.addEventListener('pause', this._handlePause.bind(this));
+    });
+  }
 
-      item.currentTime = this.audio.currentTime;
+  _updateCurrentTimeForItem(currentTime, item) {
+    return this.ps.prom('system.getItemByChannelIdId', {id: item.id, channelId: item.channelId}).then(res => {
+      let resItem = res.item;
 
-      return this.ps.prom('system.addOrUpdateItem', {item: item});
+      resItem.currentTime = currentTime;
+
+      return this.ps.prom('system.addOrUpdateItem', {item: resItem});
     });
   }
 
