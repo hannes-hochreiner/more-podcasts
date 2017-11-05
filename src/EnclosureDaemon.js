@@ -24,7 +24,7 @@ export default class EnclosureDaemon {
 
     pps('system.getAllEnclosureDocs').then(res => {
       let docs = res.enclosureDocs.filter(encDoc => {
-        return !encDoc._attachments;
+        return !encDoc._attachments && !encDoc.failed;
       });
 
       if (docs.length === 0) {
@@ -39,6 +39,25 @@ export default class EnclosureDaemon {
           channelId: docs[0].channelId,
           itemId: docs[0].itemId,
           enclosure: res.blob
+        });
+      }).then(() => {
+        return pps('system.getEnclosureDocByChannelIdItemId', {
+          channelId: docs[0].channelId,
+          itemId: docs[0].itemId
+        }).then(resDoc => {
+          if (resDoc.enclosureDoc.failed) {
+            delete resDoc.enclosureDoc.failed;
+            return pps('system.addOrUpdateEnclosureDoc', {resDoc});
+          }
+        });
+      }).catch(err => {
+        return pps('system.getEnclosureDocByChannelIdItemId', {
+          channelId: docs[0].channelId,
+          itemId: docs[0].itemId
+        }).then(resDoc => {
+          resDoc.enclosureDoc.failed = true;
+
+          return pps('system.addOrUpdateEnclosureDoc', {resDoc});
         });
       });
     }).then(() => {

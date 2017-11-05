@@ -127,7 +127,10 @@ export default class ChannelView extends Component {
               if (enclosureDoc) {
                 let downloadStatus = 'requested';
 
-                if (enclosureDoc._attachments) {
+                if (enclosureDoc.failed) {
+                  downloadStatus = 'failed';
+                  menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
+                } else if (enclosureDoc._attachments) {
                   downloadStatus = 'available';
                   menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
                   menuEntries.push({label: 'play', onClick: this._play.bind(this, item.channelId, item.id)});

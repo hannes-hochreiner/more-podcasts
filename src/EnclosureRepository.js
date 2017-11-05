@@ -5,6 +5,7 @@ export default class EnclosureRepository {
 
     this._ps.subscribe('system.getAllEnclosureDocs.request', this.getAllEnclosureDocs.bind(this));
     this._ps.subscribe('system.getEnclosureDocsByChannelId.request', this.getEnclosureDocsByChannelId.bind(this));
+    this._ps.subscribe('system.getEnclosureDocByChannelIdItemId.request', this.getEnclosureDocByChannelIdItemId.bind(this));
     this._ps.subscribe('system.removeEnclosureBinaryByChannelIdItemId.request', this.removeEnclosureBinaryByChannelIdItemId.bind(this));
     this._ps.subscribe('system.getEnclosureBinaryByChannelIdItemId.request', this.getEnclosureBinaryByChannelIdItemId.bind(this));
     this._ps.subscribe('system.addOrUpdateEnclosureDoc.request', this.addOrUpdateEnclosureDoc.bind(this));
@@ -43,6 +44,16 @@ export default class EnclosureRepository {
       });
     }).catch(err => {
       this._ps.publish(respId, { error: err });
+    });
+  }
+
+  getEnclosureDocByChannelIdItemId(topic, data) {
+    let respId = `system.getEnclosureDocByChannelIdItemId.response.${topic.split('.')[3]}`;
+
+    this._pouch.get(`enclosures/${data.channelId}/${data.itemId}`).then(enclDoc => {
+      this._ps.publish(respId, {enclosureDoc: enclDoc});
+    }).catch(err => {
+      this._ps.publish(respId, {error: err});
     });
   }
 
