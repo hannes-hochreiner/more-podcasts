@@ -209,7 +209,7 @@ export default class PlayerService {
     if (data.playing) {
       this.audio.removeEventListener('play', this._handlePlay.bind(this));
       this.audio.play();
-      
+
       return this._handlePlay().then(() => {
         this.audio.addEventListener('play', this._handlePlay.bind(this));
       });
@@ -238,6 +238,26 @@ export default class PlayerService {
 
   setCurrentTime(realm, component, topic, id, data) {
     this.audio.currentTime = data.currentTime;
+
+    let timeoutId = this.delayedCurrentTimeTimeoutId;
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    this.delayedCurrentTimeTimeoutId = setTimeout(this._delayedCurrentTimeUpdate.bind(this), 1500);
+  }
+
+  _delayedCurrentTimeUpdate() {
+    delete this.delayedCurrentTimeTimeoutId;
+    let currentTime = this.audio.currentTime;
+    let item = this.item;
+
+    if (!item || !currentTime) {
+      return;
+    }
+
+    this._updateCurrentTimeForItem(currentTime, item);
   }
 
   getCurrentTime(realm, component, topic, id, data) {
