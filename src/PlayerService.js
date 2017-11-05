@@ -1,6 +1,3 @@
-import PubSub from 'pubsub-js';
-import {promisedPubSub as pps} from './utils';
-
 export default class PlayerService {
   constructor(ps) {
     this.ps = ps;

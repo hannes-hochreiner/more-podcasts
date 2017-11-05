@@ -1,4 +1,3 @@
-import PubSub from 'pubsub-js';
 import {promisedPubSub as pps} from './utils';
 
 export default class EnclosureDaemon {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {List, ListItem} from 'material-ui/List';
 import PlayerPresenter from './PlayerPresenter';
-import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
 import AppBar from 'material-ui/AppBar';
 import IconMenu from 'material-ui/IconMenu';
@@ -108,11 +108,11 @@ export default class PlayerView extends Component {
     let sec = `${Math.round(value % 60)}`;
     let min = `${Math.floor(value / 60)}`;
 
-    if (sec.length == 1) {
+    if (sec.length === 1) {
       sec = '0' + sec;
     }
 
-    if (min.length == 1) {
+    if (min.length === 1) {
       min = '0' + min;
     }
 

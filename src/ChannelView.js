@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import {List, ListItem} from 'material-ui/List';
-import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
-import RaisedButton from 'material-ui/RaisedButton';
 import ChannelPresenter from './ChannelPresenter';
-import {Tabs, Tab} from 'material-ui/Tabs';
 import Chip from 'material-ui/Chip';
 import IconButton from 'material-ui/IconButton';
 import NewIcon from 'material-ui/svg-icons/av/new-releases';
@@ -94,7 +90,7 @@ export default class ChannelView extends Component {
 
     return (
       <div>
-        <AppBar title="channel" showMenuIconButton="false" iconElementLeft={backNavigation}/>
+        <AppBar title="channel" showMenuIconButton={false} iconElementLeft={backNavigation}/>
         <List>
           {this.state.items.map(item => {
             let menuEntries = [{label: 'toggle new', onClick: this._toggleNew.bind(this, item.channelId, item.id)}];

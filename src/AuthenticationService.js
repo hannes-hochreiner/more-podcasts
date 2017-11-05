@@ -1,6 +1,6 @@
 import PubSub from 'pubsub-js';
 import {promisedPubSub as pps} from './utils';
-import { CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
+import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
 export default class AuthenticationService {
   constructor() {
