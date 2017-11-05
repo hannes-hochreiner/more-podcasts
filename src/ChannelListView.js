@@ -80,7 +80,7 @@ export default class ChannelListView extends Component {
 
     return (
       <div>
-        <AppBar title="channels" showMenuIconButton={false} iconElementLeft={menu}/>
+        <AppBar title="channels" iconElementLeft={menu}/>
         <Toolbar>
           <ToolbarGroup firstChild={true}>
             <TextField

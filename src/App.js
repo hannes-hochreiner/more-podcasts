@@ -16,7 +16,7 @@ const muiTheme = getMuiTheme({
   }
 });
 
-class App extends Component {
+export default class App extends Component {
   render() {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
@@ -28,18 +28,4 @@ class App extends Component {
       </MuiThemeProvider>
     );
   }
-
-  _logout() {
-    PubSub.publish('system.logout.request.1');
-  }
-
-  _getApiChannels() {
-    PubSub.publish('system.getApiChannels.request.1');
-  }
-
-  _postNewApiChannel() {
-    PubSub.publish('system.postNewApiChannel.request.1', {url: 'http://sixgun.org/feed/gnr'});
-  }
 }
-
-export default App;

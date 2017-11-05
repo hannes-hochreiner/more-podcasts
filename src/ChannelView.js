@@ -90,7 +90,7 @@ export default class ChannelView extends Component {
 
     return (
       <div>
-        <AppBar title="channel" showMenuIconButton={false} iconElementLeft={backNavigation}/>
+        <AppBar title="channel" iconElementLeft={backNavigation}/>
         <List>
           {this.state.items.map(item => {
             let menuEntries = [{label: 'toggle new', onClick: this._toggleNew.bind(this, item.channelId, item.id)}];
