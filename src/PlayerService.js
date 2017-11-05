@@ -165,18 +165,17 @@ export default class PlayerService {
 
     return Promise.all([
       this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}),
-      this.ps.prom('system.getEnclosureBinaryByChannelIdItemId', {channelId: this.item.channelId, itemId: this.item.id})
+      this.ps.prom('system.getEnclosureBinaryByChannelIdItemId', {channelId: this.item.channelId, itemId: this.item.id}),
+      this.ps.prom('system.getChannelById', {id: this.item.channelId})
     ]).then(res => {
       this.item = res[0].item;
 
       return this._setSource(res[1].enclosure).then(() => {
-        let currentTime = 0;
+        let channel = res[2].channel;
 
-        if (this.item.currentTime) {
-          currentTime = this.item.currentTime;
-        }
-
-        this.audio.currentTime = currentTime;
+        this.audio.currentTime = this.item.currentTime || 0;
+        this.audio.volume = channel.volume || 0.5;
+        this.audio.playbackRate = channel.speed || 1.0;
       });
     });
   }
@@ -187,6 +186,32 @@ export default class PlayerService {
 
   setSpeed(realm, component, topic, id, data) {
     this.audio.playbackRate = data.speed;
+
+    let timeoutId = this.delayedSpeedTimeoutId;
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    this.delayedSpeedTimeoutId = setTimeout(this._delayedSpeedUpdate.bind(this), 1500);
+  }
+
+  _delayedSpeedUpdate() {
+    delete this.delayedSpeedTimeoutId;
+    let speed = this.audio.playbackRate;
+    let item = this.item;
+
+    if (!item || !speed) {
+      return;
+    }
+
+    return this.ps.prom('system.getChannelById', {id: item.channelId}).then(res => {
+      let resChannel = res.channel;
+
+      resChannel.speed = speed;
+
+      return this.ps.prom('system.addOrUpdateChannel', {channel: resChannel});
+    });
   }
 
   getSpeed(realm, component, topic, id, data) {
@@ -195,6 +220,32 @@ export default class PlayerService {
 
   setVolume(realm, component, topic, id, data) {
     this.audio.volume = data.volume;
+
+    let timeoutId = this.delayedVolumeTimeoutId;
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    this.delayedVolumeTimeoutId = setTimeout(this._delayedVolumeUpdate.bind(this), 1500);
+  }
+
+  _delayedVolumeUpdate() {
+    delete this.delayedVolumeTimeoutId;
+    let volume = this.audio.volume;
+    let item = this.item;
+
+    if (!item || !volume) {
+      return;
+    }
+
+    return this.ps.prom('system.getChannelById', {id: item.channelId}).then(res => {
+      let resChannel = res.channel;
+
+      resChannel.volume = volume;
+
+      return this.ps.prom('system.addOrUpdateChannel', {channel: resChannel});
+    });
   }
 
   getVolume(realm, component, topic, id, data) {
