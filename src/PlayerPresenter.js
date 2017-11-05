@@ -100,11 +100,11 @@ export default class PlayerPresenter {
   _handleStatusChange(topic, res) {
     this._view.playing = res.status.playing;
     this._view.selectedItem = res.status.item;
+    this._view.duration = res.status.duration;
     this._view.currentTime = res.status.currentTime;
     this._view.volume = res.status.volume;
     this._view.speed = res.status.speed;
     this._view.items = res.status.playlist;
-    this._view.duration = res.status.duration;
 
     if (this._intervalCancelToken && !res.status.playing) {
       let token = this._intervalCancelToken;
