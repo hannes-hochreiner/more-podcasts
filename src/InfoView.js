@@ -21,6 +21,11 @@ export default class PlayerView extends Component {
 
   componentWillUnmount() {
     this._pres.finalize();
+    delete this._pres;
+  }
+
+  _handleLogout() {
+    this._pres.logout();
   }
 
   render() {
@@ -37,6 +42,7 @@ export default class PlayerView extends Component {
       <div>
         <AppBar title="info" iconElementLeft={menu}/>
         <p>{this.state.info}</p>
+        <button onClick={this._handleLogout.bind(this)}>logout</button>
       </div>
     );
   }

@@ -14,6 +14,10 @@ export default class InfoPresenter {
     this._view.info = this._printStatus(this._connection);
   }
 
+  logout() {
+    InfoPresenter.ps.pub('system.logout.request');
+  }
+
   goToPlayerPage() {
     InfoPresenter.ps.pub('system.goToPlayerPage.request');
   }
@@ -24,6 +28,5 @@ export default class InfoPresenter {
 
   finalize() {
     delete this._connection.onchange;
-    delete this._view;
   }
 }

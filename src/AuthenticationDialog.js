@@ -9,15 +9,28 @@ export default class AuthenticationDialog extends React.Component {
   state = {
     open: false,
     user: '',
-    pass: ''
+    pass: '',
+    passwordOnly: false
   };
 
   set open(value) {
     this.setState({open: value});
   }
 
+  set passwordOnly(value) {
+    this.setState({passwordOnly: value});
+  }
+
+  set username(value) {
+    this.setState({username: value});
+  }
+
   get username() {
     return this.state.user;
+  }
+
+  set password(value) {
+    this.setState({password: value});
   }
 
   get password() {
@@ -54,6 +67,21 @@ export default class AuthenticationDialog extends React.Component {
       />,
     ];
 
+    const usernameField = (
+      <TextField
+        id='usernameField'
+        hintText="username"
+        floatingLabelText="username"
+        fullWidth={true}
+        value={this.state.user}
+        onChange={this.handleChange.bind(this, 'user')}
+      />
+    );
+
+    const newPasswordRules = (
+      <p>the new password needs to contain at least 8 characters with one letter in lower case, one letter in upper case, one digit, and one punctuation mark.</p>
+    );
+
     return (
       <div>
         <Dialog
@@ -63,18 +91,11 @@ export default class AuthenticationDialog extends React.Component {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-          <TextField
-            id='usernameField'
-            hintText="username"
-            floatingLabelText="username"
-            fullWidth={true}
-            value={this.state.user}
-            onChange={this.handleChange.bind(this, 'user')}
-          /><br/>
+          {this.state.passwordOnly ? newPasswordRules : usernameField}
           <TextField
             id='passwordField'
-            hintText="password"
-            floatingLabelText="password"
+            hintText={this.state.passwordOnly ? 'new password' : 'password'}
+            floatingLabelText={this.state.passwordOnly ? 'new password' : 'password'}
             type="password"
             fullWidth={true}
             value={this.state.pass}

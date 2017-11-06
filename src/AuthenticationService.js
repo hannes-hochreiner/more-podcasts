@@ -59,25 +59,28 @@ export default class AuthenticationService {
         let cognitoUser = new CognitoUser(userData);
 
         cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: function (result) {
-                // User authentication was successful
-                resolve(result.getIdToken().jwtToken);
-            },
-            onFailure: function(err) {
-                // User authentication was not successful
-                reject(err);
-            },
-            newPasswordRequired: function(userAttributes, requiredAttributes) {
-                // User was signed up by an admin and must provide new
-                // password and required attributes, if any, to complete
-                // authentication.
-                console.dir(userAttributes);
-                // the api doesn't accept this field back
-                delete userAttributes.email_verified;
+          onSuccess: function (result) {
+            // User authentication was successful
+            resolve(result.getIdToken().jwtToken);
+          },
+          onFailure: function(err) {
+            // User authentication was not successful
+            reject(err);
+          },
+          newPasswordRequired: function(userAttributes, requiredAttributes) {
+            // User was signed up by an admin and must provide new
+            // password and required attributes, if any, to complete
+            // authentication.
+            pps('ui.getNewPassword').then(resNewPassword => {
+              // the api doesn't accept this field back
+              delete userAttributes.email_verified;
 
-                // Get these details and call
-                cognitoUser.completeNewPasswordChallenge('', userAttributes, this);
-            }
+              // Get these details and call
+              cognitoUser.completeNewPasswordChallenge(resNewPassword.newPassword, userAttributes, this);
+            }).catch(e => {
+              reject(e);
+            });
+          }
         });
       });
     });
