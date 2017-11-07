@@ -57,10 +57,6 @@ export default class ChannelListView extends Component {
     }
   }
 
-  _syncChannels() {
-    this._pres.syncChannels();
-  }
-
   _handleChannelSelectChange(event, isChecked) {
     this._pres.updateChannelSelection(event.target.value, isChecked);
   }
@@ -92,11 +88,6 @@ export default class ChannelListView extends Component {
               label="Add"
               primary={true}
               onClick={this._addNewChannel.bind(this)}
-            />
-            <RaisedButton
-              label="Sync"
-              primary={true}
-              onClick={this._syncChannels.bind(this)}
             />
           </ToolbarGroup>
         </Toolbar>

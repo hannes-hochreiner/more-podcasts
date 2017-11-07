@@ -34,12 +34,6 @@ export default class ChannelListPresenter {
     });
   }
 
-  syncChannels() {
-    pps('system.syncChannels').then(() => {
-      return this._updateChannels();
-    });
-  }
-
   updateChannelSelection(channelId, selected) {
     pps('system.getChannelById', {id:channelId}).then(data => {
       data.channel.selected = selected;

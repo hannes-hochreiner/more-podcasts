@@ -18,7 +18,7 @@ import ChannelRepository from './ChannelRepository';
 import ChannelSyncService from './ChannelSyncService';
 import NavigationService from './NavigationService';
 import EnclosureRepository from './EnclosureRepository';
-import EnclosureDaemon from './EnclosureDaemon';
+import UpdateDaemon from './UpdateDaemon';
 import PlayerView from './PlayerView';
 import PlayerService from './PlayerService';
 import ps from './PubSub';
@@ -42,7 +42,7 @@ new ConsoleLogger();
 new ChannelService();
 new ChannelSyncService();
 new NavigationService();
-new EnclosureDaemon();
+new UpdateDaemon(ps);
 new PlayerService(ps);
 
 injectTapEventPlugin();
