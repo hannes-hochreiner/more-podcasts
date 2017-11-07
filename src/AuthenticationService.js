@@ -42,7 +42,7 @@ export default class AuthenticationService {
   }
 
   _authenticate() {
-    pps('ui.getCredentials').then(creds => {
+    return pps('ui.getCredentials').then(creds => {
       return new Promise((resolve, reject) => {
         let authenticationDetails = new AuthenticationDetails({
             Username : creds.username,
