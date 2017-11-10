@@ -2,8 +2,7 @@ export default class PlayerService {
   constructor(ps) {
     this.ps = ps;
     this.audio = new Audio();
-    this.audio.addEventListener('play', this._handlePlay.bind(this));
-    this.audio.addEventListener('pause', this._handlePause.bind(this));
+    this.audio.onplay = this._handlePlay.bind(this);
     this.ps.reg('system.playerService.getStatus', this.getStatus.bind(this));
     this.ps.reg('system.playerService.setItem', this.setItem.bind(this));
     this.ps.reg('system.playerService.getItem', this.getItem.bind(this));
@@ -42,11 +41,20 @@ export default class PlayerService {
   }
 
   _handlePause() {
-    if (!this.audio.ended) {
-      if (this.currentTimeIntervalId) {
-        clearInterval(this.currentTimeIntervalId);
-      }
+    delete this.audio.onpause;
+    this.audio.onplay = this._handlePlay.bind(this);
 
+    if (this.currentTimeIntervalId) {
+      clearInterval(this.currentTimeIntervalId);
+    }
+
+    if (this.audio.paused) {
+      return Promise.resolve();
+    } else {
+      this.audio.pause();
+    }
+
+    if (!this.audio.ended) {
       return this._updateCurrentTimeForItem(this.audio.currentTime, this.item).then(() => {
         return this.getStatus();
       }).then(res => {
@@ -56,7 +64,7 @@ export default class PlayerService {
 
     let statusObj = {};
 
-    this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}).then(res => {
+    return this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}).then(res => {
       let item = res.item;
 
       delete item.currentTime;
@@ -87,8 +95,17 @@ export default class PlayerService {
   }
 
   _handlePlay() {
+    delete this.audio.onplay;
+    this.audio.onpause = this._handlePause.bind(this);
+
     if (!this.currentTimeIntervalId) {
       this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
+    }
+
+    if (!this.audio.paused) {
+      return Promise.resolve();
+    } else {
+      this.audio.play();
     }
 
     return this.getStatus().then(res => {
@@ -250,23 +267,14 @@ export default class PlayerService {
 
   setPlaying(realm, component, topic, id, data) {
     if (!this.item) {
-      return new Promise((resolve, reject) => { reject(new Error("No item set for playing.")); })
+      return Promise.reject(new Error("No item set for playing."));
     }
 
     if (data.playing) {
-      this.audio.removeEventListener('play', this._handlePlay.bind(this));
-      this.audio.play();
-
-      return this._handlePlay().then(() => {
-        this.audio.addEventListener('play', this._handlePlay.bind(this));
-      });
+      return this._handlePlay();
     }
 
-    this.audio.removeEventListener('pause', this._handlePause.bind(this));
-    this.audio.pause();
-    return this._handlePause().then(() => {
-      this.audio.addEventListener('pause', this._handlePause.bind(this));
-    });
+    return this._handlePause();
   }
 
   _updateCurrentTimeForItem(currentTime, item) {

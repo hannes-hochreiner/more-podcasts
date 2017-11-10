@@ -12,6 +12,8 @@ import SpeedHighIcon from 'material-ui/svg-icons/av/fast-forward';
 import SpeedLowIcon from 'material-ui/svg-icons/av/play-arrow';
 import VolumeHighIcon from 'material-ui/svg-icons/av/volume-up';
 import VolumeLowIcon from 'material-ui/svg-icons/av/volume-down';
+import PlayIcon from 'material-ui/svg-icons/av/play-circle-filled';
+import PauseIcon from 'material-ui/svg-icons/av/pause-circle-filled';
 import Slider from 'material-ui/Slider';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import './PlayerView.css';
@@ -140,19 +142,32 @@ export default class PlayerView extends Component {
       </IconMenu>);
     }
 
+    const playButton = (
+      <IconButton
+        disabled={!this.state.selectedItem || this.state.playing}
+        onClick={() => {this._pres.start()}}
+      >
+        <PlayIcon/>
+      </IconButton>
+    );
+
+    const pauseButton = (
+      <IconButton
+        disabled={!this.state.selectedItem || !this.state.playing}
+        onClick={() => {this._pres.stop()}}
+      >
+        <PauseIcon/>
+      </IconButton>
+    );
+
+    let pausePlayButton = this.state.playing ? pauseButton : playButton;
+
     return (
       <div>
         <AppBar title="player" iconElementLeft={menu}/>
         <Toolbar>
           <ToolbarGroup firstChild={true}>
-            <RaisedButton label="play" primary={true}
-              disabled={!this.state.selectedItem || this.state.playing}
-              onClick={() => {this._pres.start()}}
-            />
-            <RaisedButton label="stop" primary={true}
-              disabled={!this.state.selectedItem || !this.state.playing}
-              onClick={() => {this._pres.stop()}}
-            />
+            {pausePlayButton}
             {this.state.selectedItem ? this.state.selectedItem.title : ''}
           </ToolbarGroup>
         </Toolbar>
