@@ -2,7 +2,7 @@ export default class UpdateDaemon {
   constructor(ps) {
     this.ps = ps;
     this.currentlyRunning = false;
-    setInterval(this.tick.bind(this), 60 * 1000);
+    setInterval(this.tick.bind(this), 30 * 1000);
   }
 
   tick() {
