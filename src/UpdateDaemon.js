@@ -11,8 +11,8 @@ export default class UpdateDaemon {
     }
 
     let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    let connectionTypeCheck = connection.type && !(connection.type === 'ethernet' || connection.type === 'wifi');
-    let connectionSaveDataCheck = connection.saveData;
+    let connectionTypeCheckFailed = typeof connection.type !== 'undefined' && !(connection.type === 'ethernet' || connection.type === 'wifi');
+    let connectionSaveDataCheckFailed = typeof connection.saveData !== 'undefined' && connection.saveData;
 
     if (connection && (connectionTypeCheck || connectionSaveDataCheck)) {
       return;
