@@ -7,7 +7,12 @@ export default class InfoPresenter {
   }
 
   _printStatus(conn) {
-    return `type: ${conn.type}; effType: ${conn.effectiveType}; downlinkMax: ${conn.downlinkMax}; downlink: ${conn.downlink}; rtt: ${conn.rtt}; saveData: ${conn.saveData}`;
+    let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    let connectionTypeCheckFailed = typeof connection.type !== 'undefined' && !(connection.type === 'ethernet' || connection.type === 'wifi');
+    let connectionSaveDataCheckFailed = typeof connection.saveData !== 'undefined' && connection.saveData;
+    let connTest = connection && (connectionTypeCheck || connectionSaveDataCheck));
+
+    return `type: ${conn.type}; effType: ${conn.effectiveType}; downlinkMax: ${conn.downlinkMax}; downlink: ${conn.downlink}; rtt: ${conn.rtt}; saveData: ${conn.saveData}; test: ${connTest}`;
   }
 
   _handleChange() {
