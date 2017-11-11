@@ -10,7 +10,7 @@ export default class InfoPresenter {
     let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     let connectionTypeCheckFailed = typeof connection.type !== 'undefined' && !(connection.type === 'ethernet' || connection.type === 'wifi');
     let connectionSaveDataCheckFailed = typeof connection.saveData !== 'undefined' && connection.saveData;
-    let connTest = connection && (connectionTypeCheck || connectionSaveDataCheck));
+    let connTest = connection && (connectionTypeCheckFailed || connectionSaveDataCheckFailed);
 
     return `type: ${conn.type}; effType: ${conn.effectiveType}; downlinkMax: ${conn.downlinkMax}; downlink: ${conn.downlink}; rtt: ${conn.rtt}; saveData: ${conn.saveData}; test: ${connTest}`;
   }

@@ -14,7 +14,7 @@ export default class UpdateDaemon {
     let connectionTypeCheckFailed = typeof connection.type !== 'undefined' && !(connection.type === 'ethernet' || connection.type === 'wifi');
     let connectionSaveDataCheckFailed = typeof connection.saveData !== 'undefined' && connection.saveData;
 
-    if (connection && (connectionTypeCheck || connectionSaveDataCheck)) {
+    if (connection && (connectionTypeCheckFailed || connectionSaveDataCheckFailed)) {
       return;
     }
 
