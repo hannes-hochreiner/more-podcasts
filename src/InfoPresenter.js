@@ -1,22 +1,9 @@
 export default class InfoPresenter {
   constructor(view) {
     this._view = view;
-    this._connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    this._connection.onchange = this._handleChange.bind(this);
-    this._view.info = this._printStatus(this._connection);
-  }
-
-  _printStatus(conn) {
-    let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    let connectionTypeCheckFailed = typeof connection.type !== 'undefined' && !(connection.type === 'ethernet' || connection.type === 'wifi');
-    let connectionSaveDataCheckFailed = typeof connection.saveData !== 'undefined' && connection.saveData;
-    let connTest = connection && (connectionTypeCheckFailed || connectionSaveDataCheckFailed);
-
-    return `type: ${conn.type}; effType: ${conn.effectiveType}; downlinkMax: ${conn.downlinkMax}; downlink: ${conn.downlink}; rtt: ${conn.rtt}; saveData: ${conn.saveData}; test: ${connTest}`;
-  }
-
-  _handleChange() {
-    this._view.info = this._printStatus(this._connection);
+    this._view.networkSaveData = InfoPresenter.NetworkTest.saveData;
+    this._view.networkType = InfoPresenter.NetworkTest.type;
+    this._view.networkAccess = InfoPresenter.NetworkTest.shouldAccessNetwork;
   }
 
   logout() {
@@ -32,6 +19,6 @@ export default class InfoPresenter {
   }
 
   finalize() {
-    delete this._connection.onchange;
+    delete this._view;
   }
 }

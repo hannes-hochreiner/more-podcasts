@@ -5,14 +5,27 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui/svg-icons/navigation/menu';
+import {List, ListItem} from 'material-ui/List';
+import NetworkAccess from 'material-ui/svg-icons/device/network-wifi';
+import NetworkLocked from 'material-ui/svg-icons/notification/network-locked';
 
 export default class PlayerView extends Component {
   state = {
-    info: ''
+    networkAccess: false,
+    networkType: '',
+    networkSaveData: ''
   };
 
-  set info(value) {
-    this.setState({info: value});
+  set networkType(value) {
+    this.setState({networkType: value});
+  }
+
+  set networkSaveData(value) {
+    this.setState({networkSaveData: value});
+  }
+
+  set networkAccess(value) {
+    this.setState({networkAccess: value});
   }
 
   componentDidMount() {
@@ -38,10 +51,24 @@ export default class PlayerView extends Component {
       <MenuItem primaryText="channels" onClick={() => {this._pres.goToChannelListPage();}}/>
     </IconMenu>;
 
+    let networkIcon = this.state.networkAccess ? (<NetworkAccess/>) : (<NetworkLocked/>);
+    let networkType = `Type: ${this.state.networkType}`;
+    let networkSaveData = `Save data: ${this.state.networkSaveData}`;
+    let networkPolicy = `Network access policy: ${this.state.networkAccess ? 'access' : 'do not access'}`;
+
     return (
       <div>
         <AppBar title="info" iconElementLeft={menu}/>
         <p>{this.state.info}</p>
+        <List>
+          <ListItem primaryText="Network access policy" leftIcon={networkIcon}
+            nestedItems={[
+              <ListItem key={1} primaryText={networkType}/>,
+              <ListItem key={2} primaryText={networkSaveData}/>,
+              <ListItem key={3} primaryText={networkPolicy}/>
+            ]}
+          />
+        </List>
         <button onClick={this._handleLogout.bind(this)}>logout</button>
       </div>
     );

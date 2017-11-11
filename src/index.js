@@ -21,10 +21,12 @@ import EnclosureRepository from './EnclosureRepository';
 import UpdateDaemon from './UpdateDaemon';
 import PlayerView from './PlayerView';
 import PlayerService from './PlayerService';
+import InfoPresenter from './InfoPresenter';
 import ps from './PubSub';
 import np from './NotificationPresenter';
 import ip from './InfoPresenter';
 import InfoView from './InfoView';
+import nt from './NetworkTest';
 
 let pouchChannels = new pouchdb('more-podcasts_channelRepository');
 let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
@@ -42,8 +44,10 @@ new ConsoleLogger();
 new ChannelService();
 new ChannelSyncService();
 new NavigationService();
-new UpdateDaemon(ps);
+new UpdateDaemon(ps, nt);
 new PlayerService(ps);
+
+InfoPresenter.NetworkTest = nt;
 
 injectTapEventPlugin();
 

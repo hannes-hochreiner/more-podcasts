@@ -1,6 +1,7 @@
 export default class UpdateDaemon {
-  constructor(ps) {
+  constructor(ps, nt) {
     this.ps = ps;
+    this.nt = nt;
     this.currentlyRunning = false;
     setInterval(this.tick.bind(this), 30 * 1000);
   }
@@ -10,11 +11,7 @@ export default class UpdateDaemon {
       return;
     }
 
-    let connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    let connectionTypeCheckFailed = typeof connection.type !== 'undefined' && !(connection.type === 'ethernet' || connection.type === 'wifi');
-    let connectionSaveDataCheckFailed = typeof connection.saveData !== 'undefined' && connection.saveData;
-
-    if (connection && (connectionTypeCheckFailed || connectionSaveDataCheckFailed)) {
+    if (!this.nt.shouldAccessNetwork) {
       return;
     }
 
