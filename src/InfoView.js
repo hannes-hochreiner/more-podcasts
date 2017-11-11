@@ -13,8 +13,18 @@ export default class PlayerView extends Component {
   state = {
     networkAccess: false,
     networkType: '',
-    networkSaveData: ''
+    networkSaveData: '',
+    storageInfo: '',
+    fileSystemSize: ''
   };
+
+  set fileSystemSize(value) {
+    this.setState({fileSystemSize: value});
+  }
+
+  set storageInfo(value) {
+    this.setState({storageInfo: value});
+  }
 
   set networkType(value) {
     this.setState({networkType: value});
@@ -68,6 +78,8 @@ export default class PlayerView extends Component {
               <ListItem key={3} primaryText={networkPolicy}/>
             ]}
           />
+          <ListItem primaryText={this.state.storageInfo}/>
+          <ListItem primaryText={this.state.fileSystemSize}/>
         </List>
         <button onClick={this._handleLogout.bind(this)}>logout</button>
       </div>
