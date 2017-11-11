@@ -6,7 +6,9 @@ export default class PlayerPresenter {
     this._view = view;
 
     this._statusToken = PubSub.subscribe('system.playerService.statusChanged', this._handleStatusChange.bind(this));
-    this._updateCurrentState();
+    this._updateCurrentState().catch(err => {
+      PubSub.publish('user.notification.showError', {error: err});
+    });
   }
 
   _updateCurrentState() {
