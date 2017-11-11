@@ -1,6 +1,6 @@
 {
   "name": "more-podcasts",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "description": "A simple offline first app for listening to podcasts.",
   "private": true,
   "dependencies": {
