@@ -14,8 +14,15 @@ import BackIcon from 'material-ui/svg-icons/navigation/arrow-back';
 export default class ChannelView extends Component {
   state = {
     items: [],
-    enclosureDocs: []
+    enclosureDocs: [],
+    binExists: []
   };
+
+  set binExists(value) {
+    this.setState({
+      binExists: value
+    });
+  }
 
   set items(value) {
     this.setState({
@@ -126,7 +133,9 @@ export default class ChannelView extends Component {
                 if (enclosureDoc.failed) {
                   downloadStatus = 'failed';
                   menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
-                } else if (enclosureDoc._attachments) {
+                } else if (this.state.binExists.find(be => {
+                  return be.channelId === enclosureDoc.channelId && be.itemId === enclosureDoc.itemId;
+                })) {
                   downloadStatus = 'available';
                   menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
                   menuEntries.push({label: 'play', onClick: this._play.bind(this, item.channelId, item.id)});

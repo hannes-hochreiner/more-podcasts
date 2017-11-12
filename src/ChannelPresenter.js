@@ -65,10 +65,15 @@ export default class ChannelPresenter {
       pps('system.getItemsByChannelId', {channelId: this._view.channelId}),
       pps('system.getEnclosureDocsByChannelId', {channelId: this._view.channelId})
     ]).then(res => {
-      this._view.items = res[0].items.sort((i1, i2) => {
-        return -i1.date.localeCompare(i2.date);
+      return Promise.all(res[1].enclosureDocs.map(doc => {
+        return pps('system.checkEnclosureBinaryExistsByChannelItemId', doc);
+      })).then(binExists => {
+        this._view.items = res[0].items.sort((i1, i2) => {
+          return -i1.date.localeCompare(i2.date);
+        });
+        this._view.enclosureDocs = res[1].enclosureDocs;
+        this._view.binExists = binExists;
       });
-      this._view.enclosureDocs = res[1].enclosureDocs;
     });
   }
 
