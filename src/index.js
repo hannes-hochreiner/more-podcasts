@@ -45,7 +45,7 @@ ip.fssTemp = fssTemporary;
 new ChannelRepository(pouchChannels, PubSub);
 new EnclosureRepository(pouchEnclosures, PubSub, fssPersistent);
 new AuthenticationService();
-new ConsoleLogger();
+// new ConsoleLogger();
 new ChannelService();
 new ChannelSyncService();
 new NavigationService();

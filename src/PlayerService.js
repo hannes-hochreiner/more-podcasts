@@ -3,7 +3,9 @@ export default class PlayerService {
     this.ps = ps;
     this.fss = fss;
     this.audio = new Audio();
-    this.audio.onplay = this._handlePlay.bind(this);
+    this._handlePlayFun = this._handlePlay.bind(this);
+    this._handlePauseFun = this._handlePause.bind(this);
+    this.audio.addEventListener('play', this._handlePlayFun);
     this.ps.reg('system.playerService.getStatus', this.getStatus.bind(this));
     this.ps.reg('system.playerService.setItem', this.setItem.bind(this));
     this.ps.reg('system.playerService.getItem', this.getItem.bind(this));
@@ -42,17 +44,10 @@ export default class PlayerService {
   }
 
   _handlePause() {
-    delete this.audio.onpause;
-    this.audio.onplay = this._handlePlay.bind(this);
+    this.audio.removeEventListener('pause', this._handlePauseFun);
 
     if (this.currentTimeIntervalId) {
       clearInterval(this.currentTimeIntervalId);
-    }
-
-    if (this.audio.paused) {
-      return Promise.resolve();
-    } else {
-      this.audio.pause();
     }
 
     if (!this.audio.ended) {
@@ -60,6 +55,7 @@ export default class PlayerService {
         return this.getStatus();
       }).then(res => {
         this.ps.pub('system.playerService.statusChanged', res);
+        this.audio.addEventListener('play', this._handlePlayFun);
       });
     }
 
@@ -96,17 +92,11 @@ export default class PlayerService {
   }
 
   _handlePlay() {
-    delete this.audio.onplay;
-    this.audio.onpause = this._handlePause.bind(this);
+    this.audio.removeEventListener('play', this._handlePlayFun);
+    this.audio.addEventListener('pause', this._handlePlauseFun);
 
     if (!this.currentTimeIntervalId) {
       this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
-    }
-
-    if (!this.audio.paused) {
-      return Promise.resolve();
-    } else {
-      this.audio.play();
     }
 
     return this.getStatus().then(res => {
@@ -135,7 +125,6 @@ export default class PlayerService {
       return Promise.all(res.enclosureDocs.map(enc => {
         return this.ps.prom('system.checkEnclosureBinaryExistsByChannelItemId', {channelId: enc.channelId, itemId: enc.itemId});
       })).then(filter => {
-        console.log(filter);
         return Promise.all(res.enclosureDocs.filter((doc, idx) => {
           return filter[idx].enclosureBinaryExists;
         }).map(enc => {
@@ -279,9 +268,13 @@ export default class PlayerService {
     }
 
     if (data.playing) {
+      this.audio.removeEventListener('play', this._handlePlayFun);
+      this.audio.play();
       return this._handlePlay();
     }
 
+    this.audio.removeEventListener('pause', this._handlePauseFun);
+    this.audio.pause();
     return this._handlePause();
   }
 
