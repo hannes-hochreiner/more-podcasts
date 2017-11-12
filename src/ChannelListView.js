@@ -79,6 +79,7 @@ export default class ChannelListView extends Component {
       targetOrigin={{horizontal: 'left', vertical: 'top'}}
     >
       <MenuItem primaryText="player" onClick={() => {this._pres.goToPlayerPage();}}/>
+      <MenuItem primaryText="info" onClick={() => {this._pres.goToInfoPage();}}/>
     </IconMenu>;
 
     const menuActions = <IconMenu

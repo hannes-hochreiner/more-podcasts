@@ -9,6 +9,9 @@ export default class ChannelListPresenter {
 
   _updateChannels() {
     return pps('system.getAllChannels').then(res => {
+      res.channels.sort((ch1, ch2) => {
+        return ch1.title.localeCompare(ch2.title);
+      });
       this._view.allChannels = res.channels;
       this._view.selectedChannels = res.channels.filter(channel => {
         return channel.selected;
@@ -18,6 +21,10 @@ export default class ChannelListPresenter {
 
   goToPlayerPage() {
     PubSub.publish('system.goToPlayerPage.request');
+  }
+
+  goToInfoPage() {
+    PubSub.publish('system.goToInfoPage.request');
   }
 
   addNewChannel(channelUrl) {
@@ -49,6 +56,6 @@ export default class ChannelListPresenter {
   }
 
   finalize() {
-
+    delete this._view;
   }
 }

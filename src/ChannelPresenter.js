@@ -73,6 +73,6 @@ export default class ChannelPresenter {
   }
 
   finalize() {
-
+    delete this._view;
   }
 }
