@@ -4,17 +4,17 @@ export default class InfoPresenter {
     this._view.networkSaveData = InfoPresenter.NetworkTest.saveData;
     this._view.networkType = InfoPresenter.NetworkTest.type;
     this._view.networkAccess = InfoPresenter.NetworkTest.shouldAccessNetwork;
-    console.dir(navigator);
-    console.dir(window);
+    InfoPresenter.fssTemp.queryUsageAndQuota().then(res => {
+      this._view.tempUsage = res.usage;
+      this._view.tempQuota = res.quota;
+    });
+    InfoPresenter.fssPers.queryUsageAndQuota().then(res => {
+      this._view.persUsage = res.usage;
+      this._view.persQuota = res.quota;
+    });
     navigator.storage.estimate().then(res => {
       this._view.storageInfo = `${Math.round(res.usage / (1024 * 1024))} MB of ${Math.round(res.quota / (1024 * 1024))} MB used (${Math.round(res.usage / res.quota * 100)}%)`;
     });
-    navigator.webkitPersistentStorage.requestQuota (1024 * 1024 * 1024 * 10, grantedBytes => {
-        // window.requestFileSystem(PERSISTENT, grantedBytes, onInitFs, errorHandler);
-          console.log(grantedBytes);
-          this._view.fileSystemSize = `${grantedBytes}`;
-        },
-        function(e) { console.log('Error', e); });
   }
 
   logout() {

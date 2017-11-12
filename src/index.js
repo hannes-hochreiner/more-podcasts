@@ -27,25 +27,30 @@ import np from './NotificationPresenter';
 import ip from './InfoPresenter';
 import InfoView from './InfoView';
 import nt from './NetworkTest';
+import FileSystemService from './FileSystemService';
 
 let pouchChannels = new pouchdb('more-podcasts_channelRepository');
 let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
+let fssPersistent = new FileSystemService(navigator.webkitPersistentStorage, window.webkitRequestFileSystem.bind(window, window.PERSISTENT));
+let fssTemporary = new FileSystemService(navigator.webkitTemporaryStorage, window.webkitRequestFileSystem.bind(window, window.TEMPORARY));
 
 ps.ps = PubSub;
 ps.uuid = uuid;
 
 np.ps = ps;
 ip.ps = ps;
+ip.fssPers = fssPersistent;
+ip.fssTemp = fssTemporary;
 
 new ChannelRepository(pouchChannels, PubSub);
-new EnclosureRepository(pouchEnclosures, PubSub);
+new EnclosureRepository(pouchEnclosures, PubSub, fssPersistent);
 new AuthenticationService();
 new ConsoleLogger();
 new ChannelService();
 new ChannelSyncService();
 new NavigationService();
 new UpdateDaemon(ps, nt);
-new PlayerService(ps);
+new PlayerService(ps, fssPersistent);
 
 InfoPresenter.NetworkTest = nt;
 

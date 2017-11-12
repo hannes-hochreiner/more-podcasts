@@ -1,6 +1,7 @@
 export default class PlayerService {
-  constructor(ps) {
+  constructor(ps, fss) {
     this.ps = ps;
+    this.fss = fss;
     this.audio = new Audio();
     this.audio.onplay = this._handlePlay.bind(this);
     this.ps.reg('system.playerService.getStatus', this.getStatus.bind(this));
@@ -131,11 +132,16 @@ export default class PlayerService {
 
   getPlaylist(realm, component, topic, id, data) {
     return this.ps.prom('system.getAllEnclosureDocs').then(res => {
-      return Promise.all(res.enclosureDocs.filter(enc => {
-        return typeof enc._attachments !== 'undefined';
-      }).map(enc => {
-        return this.ps.prom('system.getItemByChannelIdId', {channelId: enc.channelId, id: enc.itemId});
-      }));
+      return Promise.all(res.enclosureDocs.map(enc => {
+        return this.ps.prom('system.checkEnclosureBinaryExistsByChannelItemId', {channelId: enc.channelId, itemId: enc.itemId});
+      })).then(filter => {
+        console.log(filter);
+        return Promise.all(res.enclosureDocs.filter((doc, idx) => {
+          return filter[idx].enclosureBinaryExists;
+        }).map(enc => {
+          return this.ps.prom('system.getItemByChannelIdId', {channelId: enc.channelId, id: enc.itemId});
+        }));
+      });
     }).then(res => {
       return {
         playlist: res.map(itm => {
@@ -165,11 +171,7 @@ export default class PlayerService {
       this.audio.addEventListener('canplaythrough', canplaythroughFun);
       this.audio.addEventListener('error', errorFun);
 
-      if (this.audio.src) {
-        URL.revokeObjectURL(this.audio.src);
-      }
-
-      this.audio.src = URL.createObjectURL(enclosure);
+      this.audio.src = enclosure;
     });
   }
 
@@ -178,12 +180,18 @@ export default class PlayerService {
 
     return Promise.all([
       this.ps.prom('system.getItemByChannelIdId', {id: this.item.id, channelId: this.item.channelId}),
-      this.ps.prom('system.getEnclosureBinaryByChannelIdItemId', {channelId: this.item.channelId, itemId: this.item.id}),
+      this.fss.getFileSystem().then(res => {
+        return res.root.getDirectory('enclosures');
+      }).then(res => {
+        return res.getDirectory(this.item.channelId);
+      }).then(res => {
+        return res.getFile(this.item.id);
+      }),
       this.ps.prom('system.getChannelById', {id: this.item.channelId})
     ]).then(res => {
       this.item = res[0].item;
 
-      return this._setSource(res[1].enclosure).then(() => {
+      return this._setSource(res[1].URL).then(() => {
         let channel = res[2].channel;
 
         this.audio.currentTime = this.item.currentTime || 0;

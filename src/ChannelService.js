@@ -26,6 +26,8 @@ export default class ChannelService {
       } else {
         PubSub.publish(`system.getApiItemBlobByChannelIdId.response.${topic.split('.')[3]}`, {blob: res.data});
       }
+    }).catch(err => {
+      PubSub.publish(`system.getApiItemBlobByChannelIdId.response.${topic.split('.')[3]}`, {error: err});
     });
   }
 
