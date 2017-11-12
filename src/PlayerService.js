@@ -93,7 +93,7 @@ export default class PlayerService {
 
   _handlePlay() {
     this.audio.removeEventListener('play', this._handlePlayFun);
-    this.audio.addEventListener('pause', this._handlePlauseFun);
+    this.audio.addEventListener('pause', this._handlePauseFun);
 
     if (!this.currentTimeIntervalId) {
       this.currentTimeIntervalId = setInterval(this._handleCurrentTimeUpdate.bind(this), 3000);
