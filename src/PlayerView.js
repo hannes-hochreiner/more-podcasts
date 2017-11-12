@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {List, ListItem} from 'material-ui/List';
 import PlayerPresenter from './PlayerPresenter';
 import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
-import RaisedButton from 'material-ui/RaisedButton';
 import AppBar from 'material-ui/AppBar';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';

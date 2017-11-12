@@ -65,7 +65,7 @@ export default class UpdateDaemon {
       });
     }).then(() => {
       let oldLastSync = this.lastSync;
-      this.lastSync = (new Date).toISOString().substr(0, 10);
+      this.lastSync = (new Date()).toISOString().substr(0, 10);
 
       if (oldLastSync !== this.lastSync) {
         return this.ps.prom('system.syncChannels');
