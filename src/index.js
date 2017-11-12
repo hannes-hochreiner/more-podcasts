@@ -28,9 +28,10 @@ import ip from './InfoPresenter';
 import InfoView from './InfoView';
 import nt from './NetworkTest';
 import FileSystemService from './FileSystemService';
+import {enclosureDbAttachmentRemoval} from './migrationFunctions';
 
-let pouchChannels = new pouchdb('more-podcasts_channelRepository');
-let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository');
+let pouchChannels = new pouchdb('more-podcasts_channelRepository', {storage: 'persistent'});
+let pouchEnclosures = new pouchdb('more-podcasts_enclosureRepository', {storage: 'persistent'});
 let fssPersistent = new FileSystemService(navigator.webkitPersistentStorage, window.webkitRequestFileSystem.bind(window, window.PERSISTENT));
 let fssTemporary = new FileSystemService(navigator.webkitTemporaryStorage, window.webkitRequestFileSystem.bind(window, window.TEMPORARY));
 
@@ -67,5 +68,8 @@ ReactDOM.render(
         <Route exact path="/info" component={InfoView}/>
       </Switch>
     </App>
-  </Router>, document.getElementById('root'));
+  </Router>, document.getElementById('root')
+);
+
 registerServiceWorker();
+enclosureDbAttachmentRemoval(pouchEnclosures);
