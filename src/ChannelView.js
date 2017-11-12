@@ -129,13 +129,15 @@ export default class ChannelView extends Component {
 
               if (enclosureDoc) {
                 let downloadStatus = 'requested';
+                let binExistsEntry = this.state.binExists.find(be => {
+                  return be.channelId === enclosureDoc.channelId && be.itemId === enclosureDoc.itemId;
+                });
+                let binExists = typeof binExistsEntry !== 'undefined' && binExistsEntry.enclosureBinaryExists;
 
                 if (enclosureDoc.failed) {
                   downloadStatus = 'failed';
                   menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
-                } else if (this.state.binExists.find(be => {
-                  return be.channelId === enclosureDoc.channelId && be.itemId === enclosureDoc.itemId;
-                })) {
+                } else if (binExists) {
                   downloadStatus = 'available';
                   menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
                   menuEntries.push({label: 'play', onClick: this._play.bind(this, item.channelId, item.id)});
