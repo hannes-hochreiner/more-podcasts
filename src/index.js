@@ -50,7 +50,7 @@ new ConsoleLogger();
 new ChannelService();
 new ChannelSyncService();
 new NavigationService();
-new UpdateDaemon(ps, nt);
+new UpdateDaemon(ps, nt, fssPersistent);
 new PlayerService(ps, fssPersistent);
 
 InfoPresenter.NetworkTest = nt;

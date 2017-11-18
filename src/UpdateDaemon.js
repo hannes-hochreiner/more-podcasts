@@ -1,7 +1,8 @@
 export default class UpdateDaemon {
-  constructor(ps, nt) {
+  constructor(ps, nt, fss) {
     this.ps = ps;
     this.nt = nt;
+    this.fss = fss;
     this.currentlyRunning = false;
     setInterval(this.tick.bind(this), 30 * 1000);
   }
@@ -33,9 +34,31 @@ export default class UpdateDaemon {
           return;
         }
 
-        return this.ps.prom('system.getApiItemBlobByChannelIdId', {
-          channelId: docs[0].channelId,
-          id: docs[0].itemId
+        return Promise.all([
+          this.ps.prom('system.getApiItemInfoByChannelIdId', {
+            channelId: docs[0].channelId,
+            id: docs[0].itemId
+          }),
+          this.fss.queryUsageAndQuota()
+        ]).then(res => {
+          let requiredSpace = parseInt(res[0].info['content-length'], 10) + res[1].usage;
+
+          if (requiredSpace < res[1].quota) {
+            return Promise.resolve();
+          }
+
+          return this.fss.requestQuota(Math.max(Math.round(requiredSpace * 1.2), 1024 * 1024 * 1024 * 1)).then(resQuota => {
+            if (requiredSpace < resQuota.quota) {
+              return Promise.resolve();
+            }
+
+            return Promise.failed(new Error('not enough space'));
+          });
+        }).then(() => {
+          return this.ps.prom('system.getApiItemBlobByChannelIdId', {
+            channelId: docs[0].channelId,
+            id: docs[0].itemId
+          });
         }).then(res => {
           return this.ps.prom('system.addOrUpdateEnclosureBinary', {
             channelId: docs[0].channelId,
@@ -50,6 +73,8 @@ export default class UpdateDaemon {
             if (resDoc.enclosureDoc.failed) {
               delete resDoc.enclosureDoc.failed;
               return this.ps.prom('system.addOrUpdateEnclosureDoc', resDoc);
+            } else {
+              return Promise.resolve();
             }
           });
         }).catch(err => {

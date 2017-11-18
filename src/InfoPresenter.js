@@ -12,9 +12,6 @@ export default class InfoPresenter {
       this._view.persUsage = res.usage;
       this._view.persQuota = res.quota;
     });
-    navigator.storage.estimate().then(res => {
-      this._view.storageInfo = `${Math.round(res.usage / (1024 * 1024))} MB of ${Math.round(res.quota / (1024 * 1024))} MB used (${Math.round(res.usage / res.quota * 100)}%)`;
-    });
   }
 
   logout() {

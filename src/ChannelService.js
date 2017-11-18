@@ -9,6 +9,26 @@ export default class ChannelService {
     PubSub.subscribe('system.postNewApiChannel.request', this._postNewApiChannel.bind(this));
     PubSub.subscribe('system.getApiItemsByChannelId.request', this._getApiItemsByChannelId.bind(this));
     PubSub.subscribe('system.getApiItemBlobByChannelIdId.request', this._getApiItemBlobByChannelIdId.bind(this));
+    PubSub.subscribe('system.getApiItemInfoByChannelIdId.request', this._getApiItemInfoByChannelIdId.bind(this));
+  }
+
+  _getApiItemInfoByChannelIdId(topic, data) {
+    pps('system.getIdToken').then(idToken => {
+      return axios.head(`https://internal.hochreiner.net/rss-json-service/channels/${data.channelId}/items/${data.id}`, {
+        headers: {
+          'Authorization': `Bearer ${idToken.idToken}`,
+          'Accept': 'audio/mpeg'
+        }
+      });
+    }).then(res => {
+      if (res.error) {
+        PubSub.publish(`system.getApiItemInfoByChannelIdId.response.${topic.split('.')[3]}`, {error: res.error});
+      } else {
+        PubSub.publish(`system.getApiItemInfoByChannelIdId.response.${topic.split('.')[3]}`, {info: res.headers});
+      }
+    }).catch(err => {
+      PubSub.publish(`system.getApiItemInfoByChannelIdId.response.${topic.split('.')[3]}`, {error: err});
+    });
   }
 
   _getApiItemBlobByChannelIdId(topic, data) {
