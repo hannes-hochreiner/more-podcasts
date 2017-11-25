@@ -19,6 +19,16 @@ export default class ChannelPresenter {
 
   refreshDownload(channelId, itemId) {
     return pps('system.removeEnclosureBinaryByChannelIdItemId', {channelId: channelId, itemId: itemId}).then(() => {
+      return pps('system.getEnclosureDocByChannelIdItemId', {channelId: channelId, itemId: itemId});
+    }).then(encDoc => {
+      if (encDoc.enclosureDoc.failed) {
+        delete encDoc.enclosureDoc.failed;
+
+        return pps('system.addOrUpdateEnclosureDoc', encDoc);
+      }
+
+      return Promise.resolve();
+    }).then(() => {
       return this._updateState();
     });
   }
