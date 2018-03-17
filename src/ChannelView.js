@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
-import {List, ListItem} from 'material-ui/List';
 import ChannelPresenter from './ChannelPresenter';
-import Chip from 'material-ui/Chip';
 import IconButton from 'material-ui/IconButton';
-import NewIcon from 'material-ui/svg-icons/av/new-releases';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
-import Avatar from 'material-ui/Avatar';
 import BackIcon from 'material-ui/svg-icons/navigation/arrow-back';
+import ItemList from './ItemList';
 
 export default class ChannelView extends Component {
   state = {
@@ -68,27 +63,7 @@ export default class ChannelView extends Component {
     this._pres.toggleTriaged(channelId, itemId);
   }
 
-  _getItemStatusString(item) {
-    let str = '';
-
-    if (item.currentTime) {
-      str += 'partially played; ';
-    }
-
-    if (item.playCount) {
-      str += `${item.playCount} times played; `;
-    }
-
-    return str;
-  }
-
   render() {
-    const iconButtonElement = (
-      <IconButton touch={true}>
-        <MoreVertIcon/>
-      </IconButton>
-    );
-
     const backNavigation = (
       <IconButton touch={true} onClick={() => {this._pres.goToChannelListPage();}}>
         <BackIcon/>
@@ -98,84 +73,16 @@ export default class ChannelView extends Component {
     return (
       <div>
         <AppBar title="channel" iconElementLeft={backNavigation}/>
-        <List>
-          {this.state.items.map(item => {
-            let menuEntries = [{label: 'toggle new', onClick: this._toggleNew.bind(this, item.channelId, item.id)}];
-
-            const chipStyle = {margin: 4};
-
-            let patiallyPlayedChip;
-
-            if (item.currentTime) {
-              patiallyPlayedChip = (
-                <Chip style={chipStyle}>partially played</Chip>
-              );
-            }
-
-            let playCountChip;
-
-            if (item.playCount) {
-              playCountChip = (
-                <Chip style={chipStyle}><Avatar>{item.playCount}</Avatar>times played</Chip>
-              );
-            }
-
-            let downloadChip;
-
-            if (this.state.enclosureDocs) {
-              let enclosureDoc = this.state.enclosureDocs.find(encDoc => {
-                return encDoc.itemId === item.id && encDoc.channelId === item.channelId;
-              });
-
-              if (enclosureDoc) {
-                let downloadStatus = 'requested';
-                let binExistsEntry = this.state.binExists.find(be => {
-                  return be.channelId === enclosureDoc.channelId && be.itemId === enclosureDoc.itemId;
-                });
-                let binExists = typeof binExistsEntry !== 'undefined' && binExistsEntry.enclosureBinaryExists;
-
-                if (enclosureDoc.failed) {
-                  downloadStatus = 'failed';
-                  menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
-                } else if (binExists) {
-                  downloadStatus = 'available';
-                  menuEntries.push({label: 'refresh download', onClick: this._refreshDownload.bind(this, item.channelId, item.id)});
-                  menuEntries.push({label: 'play', onClick: this._play.bind(this, item.channelId, item.id)});
-                }
-
-                menuEntries.push({label: 'remove download', onClick: this._removeDownload.bind(this, item.channelId, item.id)});
-
-                downloadChip = (
-                  <Chip style={chipStyle}>download {downloadStatus}</Chip>
-                );
-              } else {
-                menuEntries.push({label: 'request download', onClick: this._requestDownload.bind(this, item.channelId, item.id)});
-              }
-            }
-
-            let newChip;
-
-            if (!item.triaged) {
-              newChip = (
-                <Chip style={chipStyle}><Avatar><NewIcon/></Avatar>new</Chip>
-              );
-            }
-
-            const rightIconMenu = (
-              <IconMenu iconButtonElement={iconButtonElement}>
-                {menuEntries.map(ent => {
-                  return (<MenuItem key={ent.label} onClick={ent.onClick}>{ent.label}</MenuItem>);
-                })}
-              </IconMenu>
-            );
-
-            return <ListItem
-              key={item.id}
-              rightIconButton={rightIconMenu}
-              primaryText={<div>{item.title}<div style={{display: 'flex', flexWrap: 'wrap',}}>{newChip}{patiallyPlayedChip}{playCountChip}{downloadChip}</div></div>}
-            />;
-          })}
-        </List>
+        <ItemList
+          items={this.state.items}
+          enclosureDocs={this.state.enclosureDocs}
+          binExists={this.state.binExists}
+          onToggleNew={this._toggleNew.bind(this)}
+          onPlay={this._play.bind(this)}
+          onRefreshDownloads={this._refreshDownload.bind(this)}
+          onRemoveDownload={this._removeDownload.bind(this)}
+          onRequestDownload={this._requestDownload.bind(this)}
+        />
       </div>
     );
   }
