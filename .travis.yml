@@ -1,8 +1,12 @@
 language: node_js
 node_js:
 - node
+addons:
+  sonarcloud:
+    organization: "hannes-hochreiner-github"
 after_success:
 - npm run build
+- sonar-scanner
 - "./travis-ci_auto-publish.sh"
 env:
   global:
