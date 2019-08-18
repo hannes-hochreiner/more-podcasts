@@ -33,11 +33,15 @@ export default class ChannelSyncService {
           if (mergePropertiesFromObject(localChannel, ['title', 'description', 'url'], apiChannel)) {
             return pps('system.addOrUpdateChannel', {
               channel: localChannel
+            }).catch(err => {
+              PubSub.publish('system.log.error', {error: err});
             });
           }
         } else if (apiChannel) {
           return pps('system.addOrUpdateChannel', {
             channel: apiChannel
+          }).catch(err => {
+            PubSub.publish('system.log.error', {error: err});
           });
         } else if (localChannel) {
           return pps('system.postNewApiChannel', {url: localChannel.url}).then(() => {
@@ -48,6 +52,8 @@ export default class ChannelSyncService {
                 channel: localChannel
               });
             }
+          }).catch(err => {
+            PubSub.publish('system.log.error', {error: err});
           });
         }
       }).filter(channel => { return typeof channel !== 'undefined'; }));
