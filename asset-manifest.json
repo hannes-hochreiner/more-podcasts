@@ -1,6 +1,15 @@
 {
-  "main.css": "static/css/main.da278f66.css",
-  "main.css.map": "static/css/main.da278f66.css.map",
-  "main.js": "static/js/main.9733dbb6.js",
-  "main.js.map": "static/js/main.9733dbb6.js.map"
+  "files": {
+    "main.css": "/more-podcasts/static/css/main.b89face1.chunk.css",
+    "main.js": "/more-podcasts/static/js/main.d3181c39.chunk.js",
+    "main.js.map": "/more-podcasts/static/js/main.d3181c39.chunk.js.map",
+    "runtime~main.js": "/more-podcasts/static/js/runtime~main.bbc6b087.js",
+    "runtime~main.js.map": "/more-podcasts/static/js/runtime~main.bbc6b087.js.map",
+    "static/js/2.db5cd20c.chunk.js": "/more-podcasts/static/js/2.db5cd20c.chunk.js",
+    "static/js/2.db5cd20c.chunk.js.map": "/more-podcasts/static/js/2.db5cd20c.chunk.js.map",
+    "index.html": "/more-podcasts/index.html",
+    "precache-manifest.4a90ea60b176e2268ab87b13b9f06dcb.js": "/more-podcasts/precache-manifest.4a90ea60b176e2268ab87b13b9f06dcb.js",
+    "service-worker.js": "/more-podcasts/service-worker.js",
+    "static/css/main.b89face1.chunk.css.map": "/more-podcasts/static/css/main.b89face1.chunk.css.map"
+  }
 }
