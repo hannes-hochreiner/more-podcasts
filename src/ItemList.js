@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import {List, ListItem} from 'material-ui/List';
-import Chip from 'material-ui/Chip';
-import IconButton from 'material-ui/IconButton';
-import NewIcon from 'material-ui/svg-icons/av/new-releases';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import Avatar from 'material-ui/Avatar';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import Chip from '@material-ui/core/Chip';
+import IconButton from '@material-ui/core/IconButton';
+import NewIcon from '@material-ui/icons/NewReleases';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Avatar from '@material-ui/core/Avatar';
 
 export default class ItemList extends Component {
   state = {
@@ -132,11 +133,16 @@ export default class ItemList extends Component {
                 }
 
                 const rightIconMenu = (
-                  <IconMenu iconButtonElement={iconButtonElement}>
-                    {menuEntries.map(ent => {
-                      return (<MenuItem key={ent.label} onClick={ent.onClick}>{ent.label}</MenuItem>);
-                    })}
-                  </IconMenu>
+                  <div>
+                    <IconButton>
+                      {iconButtonElement}
+                    </IconButton>
+                    <Menu>
+                      {menuEntries.map(ent => {
+                        return (<MenuItem key={ent.label} onClick={ent.onClick}>{ent.label}</MenuItem>);
+                      })}
+                    </Menu>
+                  </div>
                 );
 
                 return <ListItem

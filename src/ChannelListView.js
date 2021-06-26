@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
-import {List, ListItem} from 'material-ui/List';
-import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
-import FlatButton from 'material-ui/FlatButton';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import Button from '@material-ui/core/Button';
 import ChannelListPresenter from './ChannelListPresenter';
-import {Tabs, Tab} from 'material-ui/Tabs';
-import AppBar from 'material-ui/AppBar';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import IconButton from 'material-ui/IconButton';
-import MenuIcon from 'material-ui/svg-icons/navigation/menu';
-import MoreIcon from 'material-ui/svg-icons/navigation/more-vert';
-import Dialog from 'material-ui/Dialog';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import AppBar from '@material-ui/core/AppBar';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import MoreIcon from '@material-ui/icons/MoreVert';
+import Dialog from '@material-ui/core/Dialog';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
+import ListItemText from '@material-ui/core/ListItemText';
 
 export default class ChannelListView extends Component {
   state = {
@@ -73,37 +78,41 @@ export default class ChannelListView extends Component {
   }
 
   render() {
-    const menuNav = <IconMenu
-      iconButtonElement={<IconButton><MenuIcon color={'#FFF'}/></IconButton>}
-      anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-      targetOrigin={{horizontal: 'left', vertical: 'top'}}
-    >
-      <MenuItem primaryText="player" onClick={() => {this._pres.goToPlayerPage();}}/>
-      <MenuItem primaryText="info" onClick={() => {this._pres.goToInfoPage();}}/>
-    </IconMenu>;
+    const menuNav = <div>
+      <IconButton><MenuIcon color={'#FFF'}/></IconButton>
+      <Menu
+        anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+      >
+        <MenuItem primaryText="player" onClick={() => {this._pres.goToPlayerPage();}}/>
+        <MenuItem primaryText="info" onClick={() => {this._pres.goToInfoPage();}}/>
+      </Menu>
+    </div>;
 
-    const menuActions = <IconMenu
-      iconButtonElement={<IconButton><MoreIcon color={'#FFF'}/></IconButton>}
-      anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-      targetOrigin={{horizontal: 'right', vertical: 'top'}}
-    >
-      <MenuItem primaryText="add channel" onClick={() => {
+    const menuActions = <div>
+      <IconButton><MoreIcon color={'#FFF'}/></IconButton>
+      <Menu
+        anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+        targetOrigin={{horizontal: 'right', vertical: 'top'}}
+      >
+        <MenuItem primaryText="add channel" onClick={() => {
           this.setState({
             newChannelUrl: '',
             showAddChannelDialog: true
           });
         }}/>
-    </IconMenu>
+      </Menu>
+    </div>;
 
     const addChannelDialogAction = [
-      <FlatButton
+      <Button
         label="Cancel"
         primary={true}
         onClick={() => {
           this.setState({showAddChannelDialog: false});
         }}
       />,
-      <FlatButton
+      <Button
         label="Submit"
         primary={true}
         keyboardFocused={true}
@@ -132,13 +141,25 @@ export default class ChannelListView extends Component {
           <Tab label="selected">
             <List>
               {this.state.selectedChannels.map(channel => {
+                let av = '';
+
+                if (channel.image) {
+                  av = <ListItemAvatar>
+                    <Avatar alt={channel.image.title} src={channel.image.url} />
+                  </ListItemAvatar>;
+                }
+
                 return <ListItem
                   key={channel.id}
                   value={channel.id}
-                  primaryText={channel.title}
-                  secondaryText={channel.description}
                   onClick={this._handleListItemClick.bind(this, channel.id)}
-                />;
+                >
+                  {av}  
+                  <ListItemText
+                    primaryText={channel.title}
+                    secondaryText={channel.description}
+                  />
+                </ListItem>;
               })}
             </List>
           </Tab>

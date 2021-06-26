@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import ChannelPresenter from './ChannelPresenter';
-import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import AppBar from 'material-ui/AppBar';
-import BackIcon from 'material-ui/svg-icons/navigation/arrow-back';
+import IconButton from '@material-ui/core/IconButton';
+import AppBar from '@material-ui/core/AppBar';
+import BackIcon from '@material-ui/icons/ArrowBack';
 import ItemList from './ItemList';
 
 export default class ChannelView extends Component {

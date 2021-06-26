@@ -1,7 +1,7 @@
 import React from 'react';
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 import AuthenticationPresenter from './AuthenticationPresenter';
 
@@ -59,7 +59,7 @@ export default class AuthenticationDialog extends React.Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         label="Submit"
         primary={true}
         keyboardFocused={true}

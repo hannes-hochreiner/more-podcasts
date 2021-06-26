@@ -55,7 +55,7 @@ new PlayerService(ps, fssPersistent);
 
 InfoPresenter.NetworkTest = nt;
 
-injectTapEventPlugin();
+// injectTapEventPlugin();
 
 ReactDOM.render(
   <Router>

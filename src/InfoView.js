@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import InfoPresenter from './InfoPresenter';
-import AppBar from 'material-ui/AppBar';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import IconButton from 'material-ui/IconButton';
-import MenuIcon from 'material-ui/svg-icons/navigation/menu';
-import {List, ListItem} from 'material-ui/List';
-import NetworkAccess from 'material-ui/svg-icons/device/network-wifi';
-import NetworkLocked from 'material-ui/svg-icons/notification/network-locked';
+import AppBar from '@material-ui/core/AppBar';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import NetworkAccess from '@material-ui/icons/NetworkWifi';
+import NetworkLocked from '@material-ui/icons/NetworkLocked';
 
 export default class PlayerView extends Component {
   state = {
@@ -70,14 +71,16 @@ export default class PlayerView extends Component {
   }
 
   render() {
-    const menu = <IconMenu
-      iconButtonElement={<IconButton><MenuIcon color={'#FFF'}/></IconButton>}
-      anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-      targetOrigin={{horizontal: 'left', vertical: 'top'}}
-    >
-      <MenuItem primaryText="player" onClick={() => {this._pres.goToPlayerPage();}}/>
-      <MenuItem primaryText="channels" onClick={() => {this._pres.goToChannelListPage();}}/>
-    </IconMenu>;
+    const menu = <div>
+      <IconButton><MenuIcon color={'#FFF'}/></IconButton>
+      <Menu
+        anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+      >
+        <MenuItem primaryText="player" onClick={() => {this._pres.goToPlayerPage();}}/>
+        <MenuItem primaryText="channels" onClick={() => {this._pres.goToChannelListPage();}}/>
+      </Menu>
+    </div>;
 
     let networkIcon = this.state.networkAccess ? (<NetworkAccess/>) : (<NetworkLocked/>);
     let networkType = `Type: ${this.state.networkType}`;
