@@ -1,7 +1,9 @@
 mod components;
 mod objects;
+mod agents;
 
 use components::channel_list::ChannelList;
+use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 
 enum Msg {
@@ -55,5 +57,6 @@ impl Component for Model {
 }
 
 fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
     yew::start_app::<ChannelList>();
 }

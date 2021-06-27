@@ -1,8 +1,10 @@
 use crate::objects::channel::Channel;
+use crate::agents::repo::{Repo, Request as RepoRequest};
 use yew::{
     format::{Json, Nothing},
     prelude::*,
     services::fetch::{FetchService, FetchTask, Request, Response},
+    agent::{Dispatcher},
 };
 use anyhow::Error;
 
@@ -11,6 +13,7 @@ pub struct ChannelList {
     fetch_task: Option<FetchTask>,
     channels: Option<Vec<Channel>>,
     error: Option<Error>,
+    repo: Dispatcher<Repo>,
 }
 
 pub enum Msg {
@@ -33,7 +36,7 @@ impl ChannelList {
         if self.fetch_task.is_some() {
             html! { <p>{ "Fetching data..." }</p> }
         } else {
-            html! { <p></p> }
+            html! {}
         }
     }
 
@@ -62,12 +65,16 @@ impl Component for ChannelList {
             });
         // 3. pass the request and callback to the fetch service
         let task = FetchService::fetch(request, callback).expect("failed to start request");
+        let mut disp = Repo::dispatcher();
+
+        disp.send(RepoRequest::GetChannels);
 
         Self {
             link,
             fetch_task: Some(task),
             channels: None,
             error: None,
+            repo: disp,
         }
     }
 
